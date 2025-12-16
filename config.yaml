@@ -1,0 +1,26 @@
+root_csv_2010 : "/home/kaouter/Bureau/projects/briefs_simplon/brief2/brief_2_ETL_football_WS/data/matches_19302010 (1).csv"
+root_csv_2014 : "/home/kaouter/Bureau/projects/briefs_simplon/brief2/brief_2_ETL_football_WS/data/WorldCupMatches2014 (1).csv"
+root_csv_2022 : "/home/kaouter/Bureau/projects/briefs_simplon/brief2/brief_2_ETL_football_WS/data/Fifa_world_cup_matches.csv"
+root_json_2018 : "/home/kaouter/Bureau/projects/briefs_simplon/brief2/brief_2_ETL_football_WS/data/data_2018.json"
+
+list_wanted_columns_2010:
+  -"Datetime",
+  -"Stage",
+  "Stadium",
+  "City",
+  "Home Team Name",
+  "Home Team Goals",
+  "Away Team Goals",
+  "Away Team Name",
+  "RoundID",
+  "MatchID",
+  
+list_wanted_columns_stadiums :
+  - "stadium_id"
+  - "stadium_name"
+  - "capacity"
+  - "city"
+  - "country"
+list_wanted_columns_tvchannels :
+  - "channel_id"
+  - "channel_name"

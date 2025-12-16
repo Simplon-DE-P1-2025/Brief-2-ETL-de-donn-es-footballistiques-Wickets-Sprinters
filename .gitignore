@@ -1,0 +1,6 @@
+*.csv
+.venv
+.ipynb
+requirements.txt
+__pycache__/
+data/
