@@ -1,7 +1,7 @@
-root_csv_2010 : "/home/kaouter/Bureau/projects/briefs_simplon/brief2/brief_2_ETL_football_WS/data/matches_19302010 (1).csv"
-root_csv_2014 : "/home/kaouter/Bureau/projects/briefs_simplon/brief2/brief_2_ETL_football_WS/data/WorldCupMatches2014 (1).csv"
-root_csv_2022 : "/home/kaouter/Bureau/projects/briefs_simplon/brief2/brief_2_ETL_football_WS/data/Fifa_world_cup_matches.csv"
-root_json_2018 : "/home/kaouter/Bureau/projects/briefs_simplon/brief2/brief_2_ETL_football_WS/data/data_2018.json"
+root_csv_2010 : "data/matches_19302010.csv"
+root_csv_2014 : "data/WorldCupMatches2014.csv"
+root_csv_2022 : "data/Fifa_world_cup_matches.csv"
+root_json_2018 : "data/WorldCupMatches2014.csv"
 
 list_wanted_columns_2010:
   -"Datetime",
