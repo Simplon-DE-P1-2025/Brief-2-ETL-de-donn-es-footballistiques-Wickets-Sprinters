@@ -416,7 +416,6 @@ def fct_harmonize_column_values(df:pd.DataFrame, col:str , mapping_dict:Dict[str
     
     return df
 
-
 def fct_transform_data_2018(dfs_2018 : Dict[str, pd.DataFrame] , config: Dict) -> pd.DataFrame:
     """
     Transformer le DataFrame final des matches 2018 en gardant uniquement les colonnes spécifiées dans la configuration.
@@ -495,7 +494,7 @@ def fct_transform_data_2018(dfs_2018 : Dict[str, pd.DataFrame] , config: Dict) -
     df_matches_transformed = fct_iso_to_yyyymmddhhmmss(df_matches_transformed, 'date', 'formatted_date')
 
     # Eclater les listes dans la colonne 'channels' en plusieurs lignes
-    df_matches_transformed = df_matches_transformed.explode('channels').reset_index(drop=True)
+    # df_matches_transformed = df_matches_transformed.explode('channels').reset_index(drop=True)
 
     #Génerer une colonne unique 'stage' en combinant les colonnes 'round_id' et 'group_id'.
     df_matches_transformed = fct_generate_unique_stage(df_matches_transformed, 'stage', 'round_id', 'group_id')
@@ -526,12 +525,13 @@ def fct_transform_data_2018(dfs_2018 : Dict[str, pd.DataFrame] , config: Dict) -
     #-------------------------------------------------------------------------
     #--------------------Garder que les colonnes demandées--------------------
     #-------------------------------------------------------------------------
-    
     list_columns_original = config['list_columns_original_2018']
     list_columns_final = config['list_wanted_columns']
-    df_2018_final = fct_final_columns_to_keep(df_2018_final, list_columns_original, list_columns_final)
+    df_2018_final = fct_final_columns_to_keep(df_2018_final, list_columns_original, list_columns_final).sort_values(by='match_id').reset_index(drop=True)
     
     return df_2018_final
+        
+                            
 
 
 ######################## 2022  #################################################
