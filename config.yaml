@@ -24,3 +24,41 @@ list_wanted_columns_stadiums :
 list_wanted_columns_tvchannels :
   - "channel_id"
   - "channel_name"
+
+# paramètres pour la fonction de transformation du fichier WorldCupMatches2014.csv
+trf_file_wcup_2014:
+  colonnes_retenues:
+    - Year
+    - Datetime
+    - Stage
+    - City
+    - Home Team Name
+    - Home Team Goals
+    - Away Team Goals
+    - Away Team Name
+
+  news_columns:
+    year: edition
+    home_team_name: home_team
+    away_team_name: away_team
+    home_team_goals: home_result
+    away_team_goals: away_result
+
+  stage_mapping:
+    Group A: group_a
+    Group B: group_b
+    Group C: group_c
+    Group D: group_d
+    Group E: group_e
+    Group F: group_f
+    Group G: group_g
+    Group H: group_h
+    Round of 16: round_of_16
+    Quarter-finals: quarter_finals
+    Semi-finals: semi_finals
+    Play-off for third place: third_place
+    Final: final
+
+  correction_team_mapping:
+    'rn">Bosnia and Herzegovina': Bosnia and Herzegovina
+    "C�te d'Ivoire": Ivory Coast

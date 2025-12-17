@@ -25,3 +25,5 @@ def fct_load_config(config_filename: str ="config.yaml") -> dict:
         config = yaml.safe_load(f)
 
     return config
+
+

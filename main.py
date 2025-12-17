@@ -9,6 +9,7 @@ Goal:
 
 import yaml
 from src.etl.extract import fct_extract_data
+from src.etl.transform import normalize_datetime, test_country_column, trf_file_wcup_2014
 from src.utils import fct_load_config
 import pandas as pd
 import os
@@ -27,4 +28,15 @@ fct_extract_data(root_csv_2010, root_csv_2014, root_csv_2022, root_json_2018)
 
 # Display the first few rows of the consolidated DataFrame
 
+def main() -> None:
 
+    df = extract (chemin)
+    df = extract (chemin)
+    df = extract (chemin)
+    df = extract (chemin)
+    
+    df_2014_clean = transform(df_2014)
+
+
+if __name__ == "__main__":
+    main()

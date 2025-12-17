@@ -2,6 +2,7 @@ import pandas as pd
 import json
 
 
+
 def fct_read_csv(root_file: str) -> pd.DataFrame:
     """
     Goal:
@@ -131,3 +132,7 @@ def fct_extract_data(
     print(df_2018['matches'].head())
     # df = pd.concat([df_2010, df_2014, df_2022, df_2018], ignore_index=True)
     return None
+
+
+# Fonction de transformation du fichier WorldCupMatches2014.csv
+
