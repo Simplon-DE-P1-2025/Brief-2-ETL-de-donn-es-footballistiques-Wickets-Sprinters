@@ -11,6 +11,7 @@ stage:
   - third_place : third place
 
 list_wanted_columns:
+  - match_id
   - "date"
   - "home_team"
   - "away_team"
