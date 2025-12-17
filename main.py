@@ -10,12 +10,20 @@ Goal:
 
 from src.etl.extract import fct_read_csv, fct_read_json_nested
 from src.etl.transform import trf_file_wcup_2014, fct_transform_data_2018, transform_2022_data
+from src.etl.load import create_postgres_engine, select_to_dataframe, execute_query
 from src.utils import fct_load_config
 import pandas as pd  # pour la manipulation de DataFrames
 import os             # pour gérer les chemins et interactions système
 from pathlib import Path  # pour manipuler les chemins de fichiers de manière portable
 from typing import Dict   # pour typer les dictionnaires dans les fonctions
 import numpy as np    # pour les opérations numériques avancées
+
+from sqlalchemy import (
+    MetaData, Table, Column,
+    Integer, String, Date
+)
+
+from sqlalchemy.orm import sessionmaker
 
 # Load configuration parameters from config.yaml
 config_path = os.path.join(os.path.dirname(__file__), 'config.yaml')
@@ -25,6 +33,11 @@ root_csv_2010 = config['root_csv_2010']
 root_csv_2014 = config['root_csv_2014']
 root_csv_2022 = config['root_csv_2022']
 root_json_2018 = config['root_json_2018']
+
+host=os.getenv("HOST")
+database=os.getenv("DATABASE")
+user=os.getenv("USER")
+password=os.getenv("PASSWORD")
 
 # Display the first few rows of the consolidated DataFrame
 
@@ -55,7 +68,48 @@ def main() -> None:
     print(df_final['match_id'].is_unique)
     
     # Load
+    engine = create_postgres_engine(
+        host=host,
+        database=database,
+        user=user,
+        password=password
+    )
     
+    metadata = MetaData()
+
+    matches = Table(
+        "matches",
+        metadata,
+        Column("match_id", Integer, primary_key=True),
+        Column("date", Date, nullable=False),
+        Column("home_team", String(100)),
+        Column("away_team", String(100)),
+        Column("home_result", Integer),
+        Column("away_result", Integer),
+        Column("stage", String(50)),
+        Column("edition", Integer),
+        Column("city", String(100)),
+        )
+
+    metadata.create_all(engine)
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    try:
+        df_final.to_sql(
+            "matches",
+            session.bind,
+            if_exists="replace",
+            index=False,
+            method="multi"
+        )
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        raise
+    finally:
+        session.close()
 
 
 if __name__ == "__main__":
