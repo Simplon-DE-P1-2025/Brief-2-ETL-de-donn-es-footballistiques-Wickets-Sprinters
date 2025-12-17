@@ -82,18 +82,18 @@ trf_file_wcup_2014:
     "C�te d'Ivoire": "Ivory Coast"
 
 stage_mapping_2018 :
-    a: group_a,
-    b: group_b,
-    c: group_c,
-    d: group_d,
-    e: group_e,
-    f: group_f,
-    g: group_g,
-    h: group_h,
-    round_16: round_of_16,
-    round_8: quarter_finals,
-    round_4: semi_finals,
-    round_2_loser: third_place,
+    a: group_a
+    b: group_b
+    c: group_c
+    d: group_d
+    e: group_e
+    f: group_f
+    g: group_g
+    h: group_h
+    round_16: round_of_16
+    round_8: quarter_finals
+    round_4: semi_finals
+    round_2_loser: third_place
     round_2 : final
 list_columns_original_2018:
   - match_match_id
