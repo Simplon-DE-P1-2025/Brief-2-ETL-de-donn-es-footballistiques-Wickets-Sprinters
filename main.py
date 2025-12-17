@@ -9,7 +9,7 @@ Goal:
 
 
 from src.etl.extract import fct_read_csv, fct_read_json_nested
-from src.etl.transform import normalize_datetime, test_country_column, trf_file_wcup_2014, fct_transform_data_2018
+from src.etl.transform import trf_file_wcup_2014, fct_transform_data_2018, transform_2022_data
 from src.utils import fct_load_config
 import pandas as pd  # pour la manipulation de DataFrames
 import os             # pour gérer les chemins et interactions système
@@ -40,9 +40,10 @@ def main() -> None:
     # transform
     df_2014_clean = trf_file_wcup_2014(df_2014, config)
     df_2018_clean = fct_transform_data_2018(dfs_2018, config)
-    print(df_2014_clean.dtypes, df_2018_clean.dtypes)
+    df_2022_clean = transform_2022_data(df_2022)
+    print(df_2018_clean.columns, df_2022_clean.columns)
     
-    
+
     # Merge et reset match_id
     
     

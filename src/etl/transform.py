@@ -554,3 +554,100 @@ def fct_transform_data_2018(dfs_2018 : Dict[str, pd.DataFrame] , config: Dict) -
     df_2018_final = fct_final_columns_to_keep(df_2018_final, list_columns_original, list_columns_final)
     
     return df_2018_final
+
+
+######################## 2022  #################################################
+
+def transform_2022_data(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Transforme les données brutes des matchs 2022 en un format nettoyé et standardisé.
+
+    Les opérations réalisées sont :
+    - Sélection et renommage des colonnes utiles
+    - Nettoyage du format de l'heure
+    - Fusion de la date et de l'heure en un timestamp unique (YYYYMMDDHHMMSS)
+    - Normalisation des noms d'équipes (Title Case)
+    - Conversion des scores en entiers (nullable Int64)
+
+    Parameters
+    ----------
+    raw_df : pandas.DataFrame
+        DataFrame contenant les données brutes des matchs avec au minimum
+        les colonnes suivantes :
+        - 'team1'
+        - 'team2'
+        - 'number of goals team1'
+        - 'number of goals team2'
+        - 'date'
+        - 'hour'
+        - 'category'
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame transformé avec les colonnes :
+        - home_team (str)
+        - away_team (str)
+        - home_result (Int64)
+        - away_result (Int64)
+        - date (str, format YYYYMMDDHHMMSS)
+        - stage (str)
+
+    Notes
+    -----
+    - Les dates invalides ou mal formées sont converties en NaT puis en NaN.
+    - Les scores non numériques sont convertis en valeurs manquantes (pd.NA).
+    """
+    
+    list_wanted_columns = [
+    'team1', 
+    'team2',
+    'number of goals team1', 
+    'number of goals team2', 
+    'date',
+    'hour',
+    'category'
+    ]
+
+    # Filtrage des colonnes
+    df_filtered = df[list_wanted_columns].copy()
+
+    df_filtered = df_filtered.rename(columns={
+    "team1": "home_team",
+    "team2": "away_team",
+    "number of goals team1": "home_result",
+    "number of goals team2": "away_result",
+    "category": "stage",
+    })
+
+    # nettoyer l'heure "17 : 00" -> "17:00"
+    df_filtered["hour"] = df_filtered["hour"].astype("string").str.replace(" ", "", regex=False)
+
+    # parse date + hour (mois en anglais)
+    dt = pd.to_datetime(
+    df_filtered["date"].astype("string").str.strip() + " " + df_filtered["hour"].astype("string"),
+    errors="coerce"
+    )
+
+    df_filtered["date"] = dt.dt.strftime("%Y%m%d%H%M%S")
+    df_filtered = df_filtered.drop(columns=["hour"])
+
+    #Noms des équipes avec la première lettre en majuscule
+    df_filtered["home_team"] = df_filtered["home_team"].astype("string").str.strip().str.lower().str.title()
+    df_filtered["away_team"] = df_filtered["away_team"].astype("string").str.strip().str.lower().str.title()
+
+    # Résultats en int 
+    df_filtered["home_result"] = pd.to_numeric(df_filtered["home_result"], errors="coerce").astype("Int64")
+    df_filtered["away_result"] = pd.to_numeric(df_filtered["away_result"], errors="coerce").astype("Int64")
+    
+    # Trier par date (ascendant : plus ancien en premier)
+    df_filtered.sort_values("date", inplace=True)
+    # Réinitialiser l'index incrémental pour match_id
+    df_filtered["match_id"] = range(1, len(df_filtered) + 1)
+    df_filtered["edition"] = None
+    df_filtered["city"] = None
+    
+    # Réorganisation des colonnes du DataFrame
+    df_filtered = df_filtered[["match_id", "date", "home_team", "away_team", "home_result", "away_result", "stage", "edition", "city"]]
+
+    return df_filtered
