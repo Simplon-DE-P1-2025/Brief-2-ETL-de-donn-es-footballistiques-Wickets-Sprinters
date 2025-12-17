@@ -8,7 +8,7 @@ Goal:
 """
 
 import yaml
-from etl.extract import fct_extract_data
+from src.etl.extract import fct_extract_data
 from src.utils import fct_load_config
 import pandas as pd
 import os

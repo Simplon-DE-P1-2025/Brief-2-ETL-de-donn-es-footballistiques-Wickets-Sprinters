@@ -4,3 +4,5 @@
 requirements.txt
 __pycache__/
 data/
+.vscode
+.env
