@@ -527,7 +527,7 @@ def fct_transform_data_2018(dfs_2018 : Dict[str, pd.DataFrame] , config: Dict) -
     #--------------------Garder que les colonnes demandées--------------------
     #-------------------------------------------------------------------------
     
-    list_columns_original = config['list_wanted_columns_2018']
+    list_columns_original = config['list_columns_original_2018']
     list_columns_final = config['list_wanted_columns']
     df_2018_final = fct_final_columns_to_keep(df_2018_final, list_columns_original, list_columns_final)
     

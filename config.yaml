@@ -77,6 +77,10 @@ trf_file_wcup_2014:
     Play-off for third place: third_place
     Final: final
 
+  correction_team_mapping:
+    'rn">Bosnia and Herzegovina': Bosnia and Herzegovina
+    "C�te d'Ivoire": "Ivory Coast"
+
 stage_mapping_2018 :
     a: group_a,
     b: group_b,
@@ -101,7 +105,3 @@ list_columns_original_2018:
   - match_stage_name
   - match_edition
   - stadium_city
-
-correction_team_mapping:
-  'rn">Bosnia and Herzegovina': Bosnia and Herzegovina
-  "C�te d'Ivoire": Ivory Coast

@@ -41,12 +41,20 @@ def main() -> None:
     df_2014_clean = trf_file_wcup_2014(df_2014, config)
     df_2018_clean = fct_transform_data_2018(dfs_2018, config)
     df_2022_clean = transform_2022_data(df_2022)
-    print(df_2018_clean.columns, df_2022_clean.columns)
+
     
 
-    # Merge et reset match_id
+    # Merge (concaténation verticale)
+    df_concat = pd.concat([df_2014_clean, df_2018_clean, df_2022_clean], ignore_index=True)
+    # Vider la colonne match_id
+    df_concat["match_id"] = None
+    # Trier par date (ascendant)
+    df_final = df_concat.sort_values("date").reset_index(drop=True)
+    # Réincrémenter match_id
+    df_final["match_id"] = range(1, len(df_final) + 1)
+    print(df_final['match_id'].is_unique)
     
-    
+    # Load
     
 
 
