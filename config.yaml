@@ -1,7 +1,24 @@
 root_csv_2010 : "data/matches_19302010.csv"
 root_csv_2014 : "data/WorldCupMatches2014.csv"
 root_csv_2022 : "data/Fifa_world_cup_matches.csv"
-root_json_2018 : "data/WorldCupMatches2014.csv"
+root_json_2018 : "data/data_2018.json"
+
+
+stage:
+  - quarter_final : 1/4 quater , quarter
+  - semi_final : 1/2
+  - final : final
+  - third_place : third place
+
+list_wanted_columns:
+  - "date"
+  - "home_team"
+  - "away_team"
+  - "home_result"
+  - "away_result"
+  - "stage"
+  - "edition"
+  - "city"
 
 list_wanted_columns_2010:
   -"Datetime",
