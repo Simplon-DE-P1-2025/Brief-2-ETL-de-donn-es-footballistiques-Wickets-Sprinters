@@ -11,7 +11,7 @@ Goal:
 from src.etl.extract import fct_read_csv, fct_read_json_nested
 from src.etl.transform import fct_transform_2010,trf_file_wcup_2014, fct_transform_data_2018, transform_2022_data
 from src.etl.load import create_postgres_engine, select_to_dataframe, execute_query
-from src.utils import fct_load_config
+from src.etl.utils import fct_load_config
 import pandas as pd  # pour la manipulation de DataFrames
 import os             # pour gérer les chemins et interactions système
 from pathlib import Path  # pour manipuler les chemins de fichiers de manière portable
