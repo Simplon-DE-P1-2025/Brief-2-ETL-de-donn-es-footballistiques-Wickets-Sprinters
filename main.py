@@ -9,7 +9,7 @@ Goal:
 
 
 from src.etl.extract import fct_read_csv, fct_read_json_nested
-from src.etl.transform import trf_file_wcup_2014, fct_transform_data_2018, transform_2022_data
+from src.etl.transform import fct_transform_2010,trf_file_wcup_2014, fct_transform_data_2018, transform_2022_data
 from src.etl.load import create_postgres_engine, select_to_dataframe, execute_query
 from src.utils import fct_load_config
 import pandas as pd  # pour la manipulation de DataFrames
@@ -43,7 +43,8 @@ password=os.getenv("PASSWORD")
 
 def main() -> None:
     # extraction
-    #df_2010 = fct_read_csv(root_csv_2010)
+
+    df_2010 = fct_read_csv(root_csv_2010)
     df_2014 = fct_read_csv(root_csv_2014)
     dfs_2018 = fct_read_json_nested(root_json_2018)
     df_2022 = fct_read_csv (root_csv_2022)
@@ -51,21 +52,25 @@ def main() -> None:
     
     
     # transform
+    df_2010_clean = fct_transform_2010(df_2010, config)
     df_2014_clean = trf_file_wcup_2014(df_2014, config)
     df_2018_clean = fct_transform_data_2018(dfs_2018, config)
-    df_2022_clean = transform_2022_data(df_2022)
+    df_2022_clean = transform_2022_data(df_2022, config)
 
     
 
-        # Merge (concaténation verticale)
-    df_concat = pd.concat([df_2014_clean, df_2018_clean, df_2022_clean], ignore_index=True)
-        # Vider la colonne match_id
+    # Merge (concaténation verticale)
+    df_concat = pd.concat([df_2010_clean,df_2014_clean, df_2018_clean, df_2022_clean], ignore_index=True)
+    # Vider la colonne match_id
     df_concat["match_id"] = None
-        # Trier par date (ascendant)
+    # Trier par date (ascendant)
     df_final = df_concat.sort_values("date").reset_index(drop=True)
-        # Réincrémenter match_id
+    # Réincrémenter match_id
     df_final["match_id"] = range(1, len(df_final) + 1)
     print(df_final['match_id'].is_unique)
+    
+    
+    print(df_final.tail(20))
     
     # Load
     engine = create_postgres_engine(

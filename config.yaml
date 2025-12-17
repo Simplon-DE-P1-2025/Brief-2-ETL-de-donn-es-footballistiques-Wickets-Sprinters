@@ -4,44 +4,52 @@ root_csv_2022 : "data/Fifa_world_cup_matches.csv"
 root_json_2018 : "data/data_2018.json"
 
 
-stage:
-  - quarter_final : 1/4 quater , quarter
-  - semi_final : 1/2
-  - final : final
-  - third_place : third place
 
-list_wanted_columns:
-  - match_id
-  - "date"
-  - "home_team"
-  - "away_team"
-  - "home_result"
-  - "away_result"
-  - "stage"
-  - "edition"
-  - "city"
+# paramètres pour la fonction de transformation du fichier matches_19302010.csv
 
-list_wanted_columns_2010:
-  -"Datetime",
-  -"Stage",
-  "Stadium",
-  "City",
-  "Home Team Name",
-  "Home Team Goals",
-  "Away Team Goals",
-  "Away Team Name",
-  "RoundID",
-  "MatchID",
-  
-list_wanted_columns_stadiums :
-  - "stadium_id"
-  - "stadium_name"
-  - "capacity"
-  - "city"
-  - "country"
-list_wanted_columns_tvchannels :
-  - "channel_id"
-  - "channel_name"
+dict_columns_2010:
+  year: date
+  team1: home_team
+  team2: away_team
+  venue: city
+  round: stage
+
+stage_mapping_2010 :
+  GROUP_STAGE : group_stage
+  1/2_FINAL : semi_finals
+  _FINAL : final
+  PRELIMINARY-Europe : preliminary
+  PRELIMINARY-N/C.America : preliminary
+  PRELIMINARY-N.E. : preliminary
+  FIRST : first
+  1/4_FINAL : quarter_finals
+  PLACES_3&4 : third_place
+  PRELIMINARY-Eur./N.E. : preliminary
+  PRELIMINARY-S.America : preliminary
+  FINAL_ROUND : final
+  PRELIMINARY-Eu./Afr. : preliminary
+  PRELIMINARY-Asia : preliminary
+  PRELIMINARY-Afr./As. : preliminary
+  PRELIMINARY-Euro/As. : preliminary
+  PRELIMINARY-E./Afr./As. : preliminary
+  PRELIMINARY-Af./As./O. : preliminary
+  PRELIMINARY-Africa : preliminary
+  PRELIMINARY-As./O. : preliminary 
+  SEMIFINAL_STAGE : semi_finals
+  QUARTERFINAL_STAGE : quarter_finals
+  PRELIMINARY-O./As. : preliminary
+  1/8_FINAL : round_of_16
+  PRELIMINARY-Oceania : preliminary
+
+columns_to_keep_2010:
+- date
+- home_team
+- away_team
+- home_result
+- away_result
+- stage
+- edition
+- city
 
 # paramètres pour la fonction de transformation du fichier WorldCupMatches2014.csv
 trf_file_wcup_2014:
@@ -81,6 +89,8 @@ trf_file_wcup_2014:
     'rn">Bosnia and Herzegovina': Bosnia and Herzegovina
     "C�te d'Ivoire": "Ivory Coast"
 
+# paramètres pour la fonction de transformation du data_2018.json
+
 stage_mapping_2018 :
     a: group_a
     b: group_b
@@ -105,3 +115,28 @@ list_columns_original_2018:
   - match_stage_name
   - match_edition
   - stadium_city
+list_wanted_columns:
+  - match_id
+  - "date"
+  - "home_team"
+  - "away_team"
+  - "home_result"
+  - "away_result"
+  - "stage"
+  - "edition"
+  - "city"
+# paramètres pour la fonction de transformation du data_Fifa_world_cup_matches.csv
+stage_mapping_2022 :
+    Group A: group_a
+    Group B: group_b
+    Group C: group_c
+    Group D: group_d
+    Group E: group_e
+    Group F: group_f
+    Group G: group_g
+    Group H: group_h
+    Round of 16: round_of_16
+    Quarter-final: quarter_finals
+    Semi-final: semi_finals
+    Play-off for third place: third_place
+    Final: final

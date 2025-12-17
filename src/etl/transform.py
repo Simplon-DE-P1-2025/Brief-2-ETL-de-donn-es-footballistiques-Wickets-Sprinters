@@ -5,6 +5,73 @@ import numpy as np
 
 from pyparsing import col
 
+
+
+##########   2010   ##################################################################
+
+def fct_transform_2010(df : pd.DataFrame , config : Dict) -> pd.DataFrame:
+    """
+    Goal:
+        Fonction qui transforme le DataFrame du dataset 2010 selon les étapes définies.
+    Parameters:
+        df (pd.DataFrame): The input DataFrame for the 2010 dataset.
+        config (str): Path to the configuration YAML file.
+    Returns:
+        pd.DataFrame: The transformed DataFrame.
+    """
+    
+    # supprimer les doublons
+    df = df.drop_duplicates()
+    
+    #creer colonnes 'home_result' et 'away_result'
+    df['score'] = df['score'].str.slice(0, 3)
+    df[['home_result','away_result']] = df['score'].str.split('-', expand=True)
+
+    #convertir les colonnes 'home_result' et 'away_result' en type Int64
+    df['home_result'] = (
+        df['home_result']
+        .astype("string")
+        .str.extract(r"(\d+)", expand=False)
+        .astype("Int64").fillna(0)
+    )
+    df['away_result'] = (
+        df['away_result']
+        .astype("string")
+        .str.extract(r"(\d+)", expand=False)
+        .astype("Int64").fillna(0)
+    )
+    
+    #rename columns pour etre homogène avec les autres datasets
+    dict_columns_2010 = config['dict_columns_2010']
+    df = df.rename(columns=dict_columns_2010)
+    
+    #home_team et away_team, garder que le nom de pays en Anglais
+    df[['home_team','home_team_lanorig']] = df['home_team'].str.split('(', expand=True)
+    df[['away_team','away_team_lanorig']] = df['away_team'].str.split('(', expand=True)
+    
+    # Convertir la colonne 'date' en format YYYY en string 
+    df["date"] = df["date"].astype("string")
+
+    #garder que l'année pour 'edition'
+    df['edition'] =df['date'].astype(int)
+    
+    #supprimer '.' dans colonne 'city'
+    df['city'] = df['city'].str.replace('.', '', regex=False)
+    
+    # Harminser la colonne 'stage' avec les valeurs définies dans le fichier config.yaml
+    stage_net = config['stage_mapping_2010']
+    df["stage"] = df["stage"].replace(stage_net)
+    
+    #garder que des colonnes nescessaires
+    columns_to_keep = config['columns_to_keep_2010']
+    df = df[columns_to_keep]
+    
+    return df
+    
+
+
+##########   2014   ##################################################################
+
 def normalize_datetime(x: Union[str, pd.Timestamp]) -> Optional[str]:
     """
     Cette fonction est relative au traitement du fichier WorldCupMatches2014.csv
@@ -536,7 +603,7 @@ def fct_transform_data_2018(dfs_2018 : Dict[str, pd.DataFrame] , config: Dict) -
 
 ######################## 2022  #################################################
 
-def transform_2022_data(df: pd.DataFrame) -> pd.DataFrame:
+def transform_2022_data(df: pd.DataFrame , config: dict) -> pd.DataFrame:
     """
     Transforme les données brutes des matchs 2022 en un format nettoyé et standardisé.
 
@@ -602,9 +669,15 @@ def transform_2022_data(df: pd.DataFrame) -> pd.DataFrame:
     df_filtered["hour"] = df_filtered["hour"].astype("string").str.replace(" ", "", regex=False)
 
     # parse date + hour (mois en anglais)
+    # dt = pd.to_datetime(
+    # df_filtered["date"].astype("string").str.strip() + " " + df_filtered["hour"].astype("string"),
+    # errors="coerce"
+    # )
     dt = pd.to_datetime(
-    df_filtered["date"].astype("string").str.strip() + " " + df_filtered["hour"].astype("string"),
-    errors="coerce"
+        df_filtered["date"].astype(str).str.strip() + " " + df_filtered["hour"].astype(str).str.strip(),
+        format="%d %b %Y %H:%M",  # exemple : '01 Jan 2022 15:30'
+        errors="coerce",
+        dayfirst=True  # si ton format est jour/mois/année
     )
 
     df_filtered["date"] = dt.dt.strftime("%Y%m%d%H%M%S")
@@ -618,14 +691,20 @@ def transform_2022_data(df: pd.DataFrame) -> pd.DataFrame:
     df_filtered["home_result"] = pd.to_numeric(df_filtered["home_result"], errors="coerce").astype("Int64")
     df_filtered["away_result"] = pd.to_numeric(df_filtered["away_result"], errors="coerce").astype("Int64")
     
+    # Harminser la colonne 'stage' avec les valeurs définies dans le fichier config.yaml
+    mapping_dict = config['stage_mapping_2022']
+    df_filtered["stage"] = df_filtered["stage"].replace(mapping_dict)
+    
     # Trier par date (ascendant : plus ancien en premier)
     df_filtered.sort_values("date", inplace=True)
     # Réinitialiser l'index incrémental pour match_id
     df_filtered["match_id"] = range(1, len(df_filtered) + 1)
-    df_filtered["edition"] = None
+    df_filtered['edition'] = df_filtered['date'].str[:4].astype(int)
     df_filtered["city"] = None
     
     # Réorganisation des colonnes du DataFrame
     df_filtered = df_filtered[["match_id", "date", "home_team", "away_team", "home_result", "away_result", "stage", "edition", "city"]]
 
+
+    
     return df_filtered
