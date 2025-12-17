@@ -501,21 +501,7 @@ def fct_transform_data_2018(dfs_2018 : Dict[str, pd.DataFrame] , config: Dict) -
     df_matches_transformed = fct_generate_unique_stage(df_matches_transformed, 'stage', 'round_id', 'group_id')
     
     # Harmoniser la colonne stage_name en fonction des valeurs de stage
-    stage_mapping = {
-        'a':'group_a',
-        'b':'group_b',
-        'c':'group_c',
-        'd':'group_d',
-        'e':'group_e',
-        'f':'group_f',
-        'g':'group_g',
-        'h':'group_h',
-        'round_16':'round_of_16',
-        'round_8':'quarter_finals',
-        'round_4':'semi_finals',
-        'round_2_loser':'third_place',
-        'round_2': 'final'
-    }
+    stage_mapping = config['stage_mapping_2018']
     df_matches_transformed = fct_harmonize_column_values(df_matches_transformed, 'stage_name', stage_mapping)
     #-------------------------------------------------------------------------
     #-----------------------Merger en dataframe finale------------------------
@@ -541,15 +527,7 @@ def fct_transform_data_2018(dfs_2018 : Dict[str, pd.DataFrame] , config: Dict) -
     #--------------------Garder que les colonnes demandées--------------------
     #-------------------------------------------------------------------------
     
-    list_columns_original = ['match_match_id',
-                            'match_formatted_date',
-                            'team_homename',
-                            'team_awayname',
-                            'match_home_result',
-                            'match_away_result',
-                            'match_stage_name',
-                            'match_edition',
-                            'stadium_city']
+    list_columns_original = config['list_wanted_columns_2018']
     list_columns_final = config['list_wanted_columns']
     df_2018_final = fct_final_columns_to_keep(df_2018_final, list_columns_original, list_columns_final)
     
