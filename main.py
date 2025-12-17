@@ -57,13 +57,13 @@ def main() -> None:
 
     
 
-    # Merge (concaténation verticale)
+        # Merge (concaténation verticale)
     df_concat = pd.concat([df_2014_clean, df_2018_clean, df_2022_clean], ignore_index=True)
-    # Vider la colonne match_id
+        # Vider la colonne match_id
     df_concat["match_id"] = None
-    # Trier par date (ascendant)
+        # Trier par date (ascendant)
     df_final = df_concat.sort_values("date").reset_index(drop=True)
-    # Réincrémenter match_id
+        # Réincrémenter match_id
     df_final["match_id"] = range(1, len(df_final) + 1)
     print(df_final['match_id'].is_unique)
     
