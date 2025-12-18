@@ -3,8 +3,11 @@ import pandas as pd
 import json
 from io import StringIO
 from pathlib import Path
-from src.etl.extract import fct_read_csv, fct_read_json_nested, fct_add_prefix_to_df, fct_extract_data
+import sys
 
+# Ajouter src au chemin Python
+sys.path.append(str(Path(__file__).resolve().parent.parent / "src"))
+from etl.extract import fct_read_csv, fct_read_json_nested, fct_add_prefix_to_df, fct_extract_data
 
 # --------------------
 # Fixtures pour fichiers temporaires

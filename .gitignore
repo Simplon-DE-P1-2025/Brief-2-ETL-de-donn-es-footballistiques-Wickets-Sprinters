@@ -6,3 +6,5 @@ __pycache__/
 data/
 .vscode
 .env
+.coverage
+.pytest_cache

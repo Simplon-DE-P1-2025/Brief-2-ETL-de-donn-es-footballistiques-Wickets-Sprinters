@@ -89,82 +89,8 @@ def fct_transform_2010(df : pd.DataFrame , config : Dict) -> pd.DataFrame:
     
 
     return df
-    
-
 
 ##########   2014   ##################################################################
-
-def normalize_datetime(x: Union[str, pd.Timestamp]) -> Optional[str]:
-    """
-    Cette fonction est relative au traitement du fichier WorldCupMatches2014.csv
-    Convertit une date/heure en chaîne de caractères au format YYYYMMDDhhmmss.
-
-    Paramètres
-    ----------
-    x : str | pandas.Timestamp
-        Date/heure à convertir (ex: "12 Jun 2014 - 17:00").
-
-    Retour
-    ------
-    str | None
-        Date/heure normalisée au format YYYYMMDDhhmmss,
-        ou None si la conversion échoue ou si la valeur est manquante.
-    """
-    try:
-        # Conversion en datetime pandas (gestion automatique de plusieurs formats)
-        dt = pd.to_datetime(x, dayfirst=True)
-
-        # Formatage final en YYYYMMDDhhmmss
-        return dt.strftime("%Y%m%d%H%M%S")
-
-    except Exception:
-        # Retourne None si la conversion échoue
-        return None
-
-def test_country_column(df: pd.DataFrame, column: str) -> Dict[str, List[str]]:
-    """
-    Cette fonction est relative au traitement du fichier WorldCupMatches2014.csv
-    Teste la colonne pour :
-    - majuscule initiale
-    - espaces superflus (début, fin, multiples)
-    - caractères spéciaux ou accentués
-    - guillemets indésirables dans la chaîne
-    """
-    issues = {
-        "not_capitalized": [],
-        "special_chars": [],
-        "extra_spaces": []
-    }
-
-    for val in df[column].dropna().unique():
-        val_str = str(val)
-        val_strip = val_str.strip()
-        
-        # Majuscule initiale
-        if not val_strip[0].isupper():
-            issues["not_capitalized"].append(val_str)
-        
-        # Espaces en début ou fin
-        if val_str != val_strip:
-            issues["extra_spaces"].append(val_str)
-        
-        # Espaces multiples à l'intérieur
-        if "  " in val_str:
-            if val_str not in issues["extra_spaces"]:
-                issues["extra_spaces"].append(val_str)
-        
-        # Caractères spéciaux ou accents incorrects (garde lettres accentuées)
-        if re.search(r'[^A-Za-zÀ-ÖØ-öø-ÿ\s\-]', val_strip):
-            if val_str not in issues["special_chars"]:
-                issues["special_chars"].append(val_str)
-        
-        # Détection spécifique des guillemets " ou '
-        if '"' in val_str or "'" in val_str:
-            if val_str not in issues["special_chars"]:
-                issues["special_chars"].append(val_str)
-
-    return issues
-
 def trf_file_wcup_2014(df: pd.DataFrame, config: Dict[str, Any]) -> pd.DataFrame:
     """
     Transforme et normalise les données des matchs de la Coupe du Monde 2014.
