@@ -1,91 +1,61 @@
-import pandas as pd 
+"""
+Extraction utilities for football World Cup datasets.
+
+This module contains helper functions used in the ETL pipeline to:
+- Read CSV files with automatic delimiter detection
+- Load and normalize nested JSON football data
+- Apply basic DataFrame transformations for downstream processing
+
+The extracted data is converted into pandas DataFrames and prepared
+for transformation and loading into a database.
+"""
+
+import pandas as pd
 import json
 from typing import Dict
+from pathlib import Path
 
 
 def fct_read_csv(root_file: str) -> pd.DataFrame:
     """
-    Goal:
-        Function to read a CSV file and return a pandas DataFrame.
-    Parameters:
-        root_file (str): The path to the CSV file.
-    Returns:
-        pd.DataFrame: The DataFrame containing the data from the CSV file.
+    Read a CSV file and return its content as a pandas DataFrame.
+
+    The function tries multiple separators (`,`, `;`, `|`, `\\t`) to automatically
+    detect the correct delimiter. If the file does not exist or no valid separator
+    is found, an empty DataFrame is returned and an informative message is printed.
+
+    Parameters
+    ----------
+    root_file : str
+        Path to the CSV file to read.
+
+    Returns
+    -------
+    pd.DataFrame
+        A pandas DataFrame containing the CSV data if successful,
+        otherwise an empty DataFrame.
     """
     seps = [',', ';', '|', '\t']
 
-    try:
-        for sep in seps:
-            try:
-                df = pd.read_csv(
-                    root_file,
-                    sep=sep,
-                    encoding="utf-8",
-                    skipinitialspace=True
-                )
-
-                # Si plus d'une colonne → bon séparateur
-                if df.shape[1] > 1:
-                    return df
-
-            except Exception:
-                continue
-
-        print(f"Aucun séparateur valide trouvé pour {root_file}")
-        return pd.DataFrame()
-
-    except FileNotFoundError:
+    if not Path(root_file).exists():
         print(f"Erreur : fichier {root_file} introuvable")
         return pd.DataFrame()
 
+    for sep in seps:
+        try:
+            df = pd.read_csv(
+                root_file,
+                sep=sep,
+                encoding="utf-8",
+                skipinitialspace=True
+            )
+            if df.shape[1] > 1:
+                return df
+        except Exception:
+            continue
 
-def fct_read_json_nested(root_file: str) -> dict:
-    """
-    Goal
-        Function to read a JSON file and return a pandas DataFrame.
-    Parameters:
-        root_file (str): The path to the JSON file.
-    Returns:
-        pd.DataFrame: The DataFrame containing the data from the JSON file.
-    """
-    with open(root_file, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-
-    dfs = {}
-
-    # --------------------
-    # DIMENSIONS
-    # --------------------
-    dfs['stadiums'] = pd.DataFrame(data.get('stadiums', []))
-    dfs['tvchannels'] = pd.DataFrame(data.get('tvchannels', []))
-    dfs['teams'] = pd.DataFrame(data.get('teams', []))
-
-    # --------------------
-    # MATCHES - GROUP STAGE
-    # --------------------
-    matches = []
-
-    for group_key, group_data in data.get('groups', {}).items():
-        for match in group_data.get('matches', []):
-            match_flat = match.copy()
-            match_flat['group'] = group_key
-            match_flat['stage'] = 'group'
-            matches.append(match_flat)
-
-    # --------------------
-    # MATCHES - KNOCKOUT
-    # --------------------
-    for round_key, round_data in data.get('knockout', {}).items():
-        for match in round_data.get('matches', []):
-            match_flat = match.copy()
-            match_flat['group'] = None
-            match_flat['stage'] = round_key
-            matches.append(match_flat)
-
-    dfs['matches'] = pd.DataFrame(matches)
-
-    return dfs
-
+    print(f"Aucun séparateur valide trouvé pour {root_file}")
+    return pd.DataFrame()
 
 
 def fct_add_prefix_to_df(df:pd.DataFrame, prefix:str) -> pd.DataFrame:
@@ -101,7 +71,6 @@ def fct_add_prefix_to_df(df:pd.DataFrame, prefix:str) -> pd.DataFrame:
     for col in df.columns:
         df.rename(columns={col: f"{prefix}_{col}"}, inplace=True)
     return df
-
 
 
 def fct_extract_data(
@@ -125,7 +94,7 @@ def fct_extract_data(
     df_2014 = fct_read_csv(root_csv_2014)
     df_2022 = fct_read_csv(root_csv_2022)
     df_2018 = fct_read_json_nested(root_json_2018)
-    
+
     print(df_2010.head())
     print(df_2014.head())
     print(df_2022.head())
@@ -143,7 +112,8 @@ def fct_read_json_nested(root_file: str) -> Dict[str, pd.DataFrame]:
         root_file (str) : Chemin du fichier JSON.
     Retour :
         dict : Dictionnaire de DataFrames pandas :
-            - 'teams', 'stadiums', 'tvchannels', 'groups', 'rounds', 'matches', 'bridge_match_channels'
+            - 'teams', 'stadiums', 'tvchannels', 'groups', 'rounds',
+            'matches', 'bridge_match_channels'
     """
     with open(root_file, 'r', encoding='utf-8') as f:
         data = json.load(f)
@@ -229,4 +199,3 @@ def fct_read_json_nested(root_file: str) -> Dict[str, pd.DataFrame]:
     dfs['rounds'] = pd.DataFrame(rounds_rows)
 
     return dfs
-

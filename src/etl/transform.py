@@ -83,10 +83,17 @@ def fct_transform_2010(df : pd.DataFrame , config : Dict) -> pd.DataFrame:
     df["match_id"] = range(1, len(df) + 1)
     
     #Réorganiser les colonnes du dataframe
-    df = df[["match_id", "date", "home_team", "away_team", "home_result", "away_result", "stage", "edition", "city"]]
-
-    print(df.tail(20))
-    
+    df = df[
+        ["match_id",
+         "date",
+         "home_team",
+         "away_team",
+         "home_result",
+         "away_result",
+         "stage",
+         "edition",
+         "city"
+         ]]
 
     return df
 
@@ -137,8 +144,7 @@ def trf_file_wcup_2014(df: pd.DataFrame, config: Dict[str, Any]) -> pd.DataFrame
       via des impressions (`print`).
     - Le DataFrame retourné est trié par date croissante.
     """
-    
-    
+
     # Sélection des colonnes pertinentes
     df_2014_news = df[config['trf_file_wcup_2014']['colonnes_retenues']]
 
@@ -161,21 +167,17 @@ def trf_file_wcup_2014(df: pd.DataFrame, config: Dict[str, Any]) -> pd.DataFrame
     df_2014_news["stage"] = df_2014_news["stage"].map(config['trf_file_wcup_2014']['stage_mapping']).fillna(df_2014_news["stage"])
 
     # Détection des anomalies dans la colonne home_team
-    home_team_results = test_country_column(df_2014_news, "home_team")
-    print(home_team_results)
+    _home_team_results = test_country_column(df_2014_news, "home_team")
 
     # normalisation des noms de la colonne home_team
     df_2014_news["home_team"] = df_2014_news["home_team"].map(config['trf_file_wcup_2014']['correction_team_mapping']).fillna(df_2014_news["home_team"])
 
-
     # Détection des anomalies dans la colonne away_team
-    away_team_results = test_country_column(df_2014_news, "away_team")
-    print(away_team_results)
+    _away_team_results = test_country_column(df_2014_news, "away_team")
 
     # normalisation des noms de la colonne away_team
     df_2014_news["away_team"] = df_2014_news["away_team"].map(config['trf_file_wcup_2014']['correction_team_mapping']).fillna(df_2014_news["away_team"])
     df_2014_news["away_team"].unique()
-
 
     # Trier par date (ascendant : plus ancien en premier)
     df_2014_news.sort_values("date", inplace=True)
@@ -184,7 +186,7 @@ def trf_file_wcup_2014(df: pd.DataFrame, config: Dict[str, Any]) -> pd.DataFrame
 
     # Réorganisation des colonnes du DataFrame
     df_2014_news = df_2014_news[["match_id", "date", "home_team", "away_team", "home_result", "away_result", "stage", "edition", "city"]]
-    
+
     return df_2014_news
 
 ##########   2018   ##################################################################
