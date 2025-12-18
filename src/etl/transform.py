@@ -43,13 +43,13 @@ def fct_transform_2010(df : pd.DataFrame , config : Dict) -> pd.DataFrame:
         df['home_result']
         .astype("string")
         .str.extract(r"(\d+)", expand=False)
-        .astype("Int64").fillna(0)
+        .astype("Int64").fillna(-999)
     )
     df['away_result'] = (
         df['away_result']
         .astype("string")
         .str.extract(r"(\d+)", expand=False)
-        .astype("Int64").fillna(0)
+        .astype("Int64").fillna(-999)
     )
     
     #rename columns pour etre homogène avec les autres datasets
@@ -77,6 +77,17 @@ def fct_transform_2010(df : pd.DataFrame , config : Dict) -> pd.DataFrame:
     columns_to_keep = config['columns_to_keep_2010']
     df = df[columns_to_keep]
     
+     # Trier par date (ascendant : plus ancien en premier)
+    df.sort_values("date", inplace=True)
+    # Réinitialiser l'index incrémental pour match_id
+    df["match_id"] = range(1, len(df) + 1)
+    
+    #Réorganiser les colonnes du dataframe
+    df = df[["match_id", "date", "home_team", "away_team", "home_result", "away_result", "stage", "edition", "city"]]
+
+    print(df.tail(20))
+    
+
     return df
     
 

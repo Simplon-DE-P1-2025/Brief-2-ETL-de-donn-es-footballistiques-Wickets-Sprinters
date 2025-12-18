@@ -67,11 +67,15 @@ def main() -> None:
     df_final = df_concat.sort_values("date").reset_index(drop=True)
     # Réincrémenter match_id
     df_final["match_id"] = range(1, len(df_final) + 1)
-    print(df_final['match_id'].is_unique)
+    # print(df_final['match_id'].is_unique)
     
     
-    print(df_final.tail(20))
+    # print(df_final.tail(20))
     
+    print(f"host: {host}")
+    print(f"database: {database}")
+    print(f"user: {user}")
+    print(f"password: {password}")
     # Load
     engine = create_postgres_engine(
         host=host,
