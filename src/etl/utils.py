@@ -1,7 +1,7 @@
 """
 Goal: This file serves to define main functions to load configuration parameters.
 """
-import pandas as pd 
+import pandas as pd
 from typing import Optional, Union, Dict, List, Any
 import re
 import numpy as np
@@ -79,25 +79,25 @@ def test_country_column(df: pd.DataFrame, column: str) -> Dict[str, List[str]]:
     for val in df[column].dropna().unique():
         val_str = str(val)
         val_strip = val_str.strip()
-        
+
         # Majuscule initiale
         if not val_strip[0].isupper():
             issues["not_capitalized"].append(val_str)
-        
+
         # Espaces en début ou fin
         if val_str != val_strip:
             issues["extra_spaces"].append(val_str)
-        
+
         # Espaces multiples à l'intérieur
         if "  " in val_str:
             if val_str not in issues["extra_spaces"]:
                 issues["extra_spaces"].append(val_str)
-        
+
         # Caractères spéciaux ou accents incorrects (garde lettres accentuées)
         if re.search(r'[^A-Za-zÀ-ÖØ-öø-ÿ\s\-]', val_strip):
             if val_str not in issues["special_chars"]:
                 issues["special_chars"].append(val_str)
-        
+
         # Détection spécifique des guillemets " ou '
         if '"' in val_str or "'" in val_str:
             if val_str not in issues["special_chars"]:
@@ -135,9 +135,11 @@ def fct_capitalize_string_columns(df: pd.DataFrame, cols: list = None) -> pd.Dat
     """
     # Vérifier que des colonnes ont été fournies
     if not cols:
-        print("[INFO] Aucune colonne spécifiée pour capitalize_string_columns. Le DataFrame reste inchangé.")
+        print(
+            "[INFO] Aucune colonne spécifiée pour capitalize_string_columns. "
+            "Le DataFrame reste inchangé.")
         return df
-    
+
     # Traiter chaque colonne spécifiée
     for col in cols:
         if col in df.columns:
@@ -165,9 +167,11 @@ def fct_upper_string_columns(df: pd.DataFrame, cols: list = None) -> pd.DataFram
     """
     # Vérifier que des colonnes ont été fournies
     if not cols:
-        print("[INFO] Aucune colonne spécifiée pour clean_string_columns_upper. Le DataFrame reste inchangé.")
+        print(
+            "[INFO] Aucune colonne spécifiée pour clean_string_columns_upper. "
+            "Le DataFrame reste inchangé.")
         return df
-    
+
     # Traiter chaque colonne spécifiée
     for col in cols:
         if col in df.columns:
@@ -194,9 +198,12 @@ def fct_lower_string_columns(df: pd.DataFrame, cols: list = None) -> pd.DataFram
     """
     # Vérifier que des colonnes ont été fournies
     if not cols:
-        print("[INFO] Aucune colonne spécifiée pour clean_string_columns_lower. Le DataFrame reste inchangé.")
+        print(
+            "[INFO] Aucune colonne spécifiée pour clean_string_columns_lower. "
+            "Le DataFrame reste inchangé."
+            )
         return df
-    
+
     # Traiter chaque colonne spécifiée
     for col in cols:
         if col in df.columns:
@@ -207,8 +214,6 @@ def fct_lower_string_columns(df: pd.DataFrame, cols: list = None) -> pd.DataFram
                 .str.lower()
             )
     return df
-
-
 
 def fct_iso_to_yyyymmddhhmmss(df: pd.DataFrame, col: str, new_col: str = None) -> pd.DataFrame:
     """
@@ -237,8 +242,6 @@ def fct_iso_to_yyyymmddhhmmss(df: pd.DataFrame, col: str, new_col: str = None) -
     df[new_col] = df[col].apply(safe_convert)
     return df
 
-
-
 def fct_extract_edition(df: pd.DataFrame, col: str) -> pd.DataFrame:
     """
     Extraire l'année d'une colonne de date ISO 8601.
@@ -253,7 +256,12 @@ def fct_extract_edition(df: pd.DataFrame, col: str) -> pd.DataFrame:
     df['edition'] = df[col].str[:4]
     return df
 
-def fct_generate_unique_stage(df: pd.DataFrame, col_stage:str , col_round:str, col_group : str) -> pd.DataFrame:
+def fct_generate_unique_stage(
+    df: pd.DataFrame,
+    col_stage:str ,
+    col_round:str,
+    col_group : str
+) -> pd.DataFrame:
     """
     Générer une colonne unique 'stage' en combinant les colonnes 'round_id' et 'group_id'.
     
@@ -278,8 +286,11 @@ def fct_generate_unique_stage(df: pd.DataFrame, col_stage:str , col_round:str, c
     df['stage_name'] = np.select(conditions, choices,  default='notdefined')
     return df
 
-
-def fct_final_columns_to_keep (df : pd.DataFrame, columns_to_keep_original_list : list, columns_to_keep_final_list : list) -> pd.DataFrame:
+def fct_final_columns_to_keep (
+    df : pd.DataFrame,
+    columns_to_keep_original_list : list,
+    columns_to_keep_final_list : list
+) -> pd.DataFrame:
     """
     Garder uniquement les colonnes spécifiées dans le DataFrame.
     
@@ -293,16 +304,20 @@ def fct_final_columns_to_keep (df : pd.DataFrame, columns_to_keep_original_list 
     """
     # Créer un dictionnaire de mappage des anciennes aux nouvelles colonnes
     column_mapping = dict(zip(columns_to_keep_original_list, columns_to_keep_final_list))
-    
+
     # Filtrer les colonnes à garder
     df_filtered = df[columns_to_keep_original_list].copy()
-    
+
     # Renommer les colonnes selon le mapping
     df_filtered.rename(columns=column_mapping, inplace=True)
-    
+
     return df_filtered
 
-def fct_harmonize_column_values(df:pd.DataFrame, col:str , mapping_dict:Dict[str, str]) -> pd.DataFrame:
+def fct_harmonize_column_values(
+    df:pd.DataFrame,
+    col:str ,
+    mapping_dict:Dict[str, str]
+) -> pd.DataFrame:
     """
     Harmoniser les valeurs d'une colonne en utilisant un dictionnaire de mappage.
     Paramètres :
@@ -315,7 +330,7 @@ def fct_harmonize_column_values(df:pd.DataFrame, col:str , mapping_dict:Dict[str
     if col not in df.columns:
         print(f"La colonne '{col}' n'existe pas dans le DataFrame.")
         return df
-    
+
     df[col] = df[col].apply(lambda x: mapping_dict.get(x, x) if pd.notnull(x) else x)
-    
+
     return df
