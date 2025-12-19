@@ -8,10 +8,16 @@ from pathlib import Path
 import pytest
 import pandas as pd
 from unittest.mock import patch
+import pytest
+import pandas as pd
+
 
 # Ajouter src au chemin Python
 sys.path.append(str(Path(__file__).resolve().parent.parent / "src"))
 from etl.transform import fct_transform_2010, trf_file_wcup_2014, fct_transform_data_2018
+
+# Importer la fonction à tester
+from etl.transform import fct_transform_data_2018
 
 ##########   test-2010   ##################################################################
 
@@ -100,27 +106,11 @@ def test_fct_transform_2010_basic(sample_df_2010, sample_config):
 
 ##########   test-2014   ##################################################################
 
-<<<<<<< HEAD
-
-
 ##########   test-2018   ##################################################################
-# tests/test_transform_2018.py
 
-=======
-##########   test-2018   ##################################################################
-# tests/test_transform_2018.py
-
-import pytest
-import pandas as pd
-from typing import Dict
-
-# Importer la fonction à tester
-from etl.transform import fct_transform_data_2018
-
->>>>>>> e35c46bc234325cc0cbb3c8596dd11891e30d161
-# --------------------
+# ============================================================================
 # Fixtures
-# --------------------
+# ============================================================================
 
 @pytest.fixture
 def sample_dfs_2018():
@@ -161,14 +151,16 @@ def sample_dfs_2018():
         })
     }
 
+
 @pytest.fixture
 def sample_dfs_2018_with_nulls(sample_dfs_2018):
-    """Fixture qui simule des valeurs manquantes pour tester le remplissage des NaN."""
+    """Fixture simulant des valeurs manquantes."""
     dfs = sample_dfs_2018.copy()
     dfs["matches"].loc[1, "round_id"] = None
     dfs["matches"].loc[1, "group_id"] = None
     dfs["matches"].loc[1, "stadium_id"] = None
     return dfs
+
 
 @pytest.fixture
 def sample_config_2018():
@@ -204,83 +196,96 @@ def sample_config_2018():
         ]
     }
 
-# --------------------
-# Test fonction
-# --------------------
+# ============================================================================
+# Tests
+# ============================================================================
 
-def test_fct_transform_data_2018_null_values(sample_dfs_2018_with_nulls, sample_config_2018):
-    """Test la gestion des valeurs null / NaN dans les matches."""
-    df_result = fct_transform_data_2018(sample_dfs_2018_with_nulls, sample_config_2018)
+def test_transform_2018_structure(sample_dfs_2018, sample_config_2018):
+    df = fct_transform_data_2018(sample_dfs_2018, sample_config_2018)
 
-    # Vérifier que 'round_id' et 'group_id' manquants sont remplacés par 'notdefined' dans le stage
-    assert "notdefined" in df_result.loc[1, "stage"]
+    assert isinstance(df, pd.DataFrame)
+    assert list(df.columns) == sample_config_2018["list_wanted_columns"]
 
-    # Vérifier que les colonnes finales ne contiennent plus de NaN
-    assert not df_result.isna().any().any()
 
-def test_fct_transform_data_2018_basic(sample_dfs_2018, sample_config_2018):
-    """Test complet de la transformation pour le dataset 2018."""
-    df_result = fct_transform_data_2018(sample_dfs_2018, sample_config_2018)
+def test_transform_2018_column_types(sample_dfs_2018, sample_config_2018):
+    df = fct_transform_data_2018(sample_dfs_2018, sample_config_2018)
 
-    # Vérifications simples
-    assert isinstance(df_result, pd.DataFrame)
-    
-    # --------------------
-    # Structure
-    # --------------------
-    assert list(df_result.columns) == sample_config_2018["list_wanted_columns"]
+    assert df["match_id"].dtype.name in ["int64", "Int64"]
+    assert df["date"].dtype.name in ["string", "String", "object"]
+    assert df["home_team"].dtype.name in ["string", "String", "object"]
+    assert df["away_team"].dtype.name in ["string", "String", "object"]
+    assert df["home_result"].dtype.name in ["int64", "Int64"]
+    assert df["away_result"].dtype.name in ["int64", "Int64"]
+    assert df["stage"].dtype.name in ["string", "String", "object"]
+    assert df["edition"].dtype.name in ["int64", "Int64"]
+    assert df["city"].dtype.name in ["string", "String", "object"]
 
-    # --------------------
-    # Types et valeurs
-    # --------------------
-    assert df_result["match_id"].dtype.name in ["int64", "Int64"]
-    assert df_result["date"].dtype.name in ["string","String", "object"]
-    assert df_result["home_team"].dtype.name in ["string","String", "object"]
-    assert df_result["away_team"].dtype.name in ["string","String", "object"]
-    assert df_result["home_result"].dtype.name in ["int64", "Int64"]
-    assert df_result["away_result"].dtype.name in ["int64", "Int64"]
-    assert df_result["stage"].dtype.name in ["string","String", "object"]
-    assert df_result["edition"].dtype.name in ["int64", "Int64"]
-    assert df_result["edition"].dtype.name in ["int64", "Int64"]
-    assert df_result["city"].dtype.name in ["string","String", "object"]
 
-    # Vérification des résultats des scores
-    assert df_result.loc[0, "home_result"] == 4
-    assert df_result.loc[0, "away_result"] == 0
-    assert df_result.loc[1, "home_result"] == 2
-    assert df_result.loc[1, "away_result"] == 1
+def test_transform_2018_scores(sample_dfs_2018, sample_config_2018):
+    df = fct_transform_data_2018(sample_dfs_2018, sample_config_2018)
 
-    # Vérification que toutes les valeurs du stage sont dans le mapping
-    valid_stages = ["group_a", "group_b", "group_c", "group_d",
-                    "group_e", "group_f", "group_g", "group_h",
-                    "round_of_16", "quarter_finals", "semi_finals",
-                    "third_place", "final"]
-    assert df_result["stage"].isin(valid_stages).all()
+    assert df.loc[0, "home_result"] == 4
+    assert df.loc[0, "away_result"] == 0
+    assert df.loc[1, "home_result"] == 2
+    assert df.loc[1, "away_result"] == 1
 
-    # Vérification du nettoyage de la ville
-    assert "." not in df_result.loc[0, "city"]
 
-    # Vérifier les noms des équipes (capitalisation)
-    for team in df_result["home_team"].tolist() + df_result["away_team"].tolist():
+def test_transform_2018_stage_values(sample_dfs_2018, sample_config_2018):
+    df = fct_transform_data_2018(sample_dfs_2018, sample_config_2018)
+
+    valid_stages = [
+        "group_a", "group_b", "group_c", "group_d",
+        "group_e", "group_f", "group_g", "group_h",
+        "round_of_16", "quarter_finals",
+        "semi_finals", "third_place", "final"
+    ]
+
+    assert df["stage"].isin(valid_stages).all()
+
+
+def test_transform_2018_city_cleaning(sample_dfs_2018, sample_config_2018):
+    df = fct_transform_data_2018(sample_dfs_2018, sample_config_2018)
+
+    assert "." not in df.loc[0, "city"]
+
+
+def test_transform_2018_team_names_capitalized(sample_dfs_2018, sample_config_2018):
+    df = fct_transform_data_2018(sample_dfs_2018, sample_config_2018)
+
+    for team in df["home_team"].tolist() + df["away_team"].tolist():
         assert team[0].isupper()
-        
-    # Vérification de l'édition
-    assert df_result.loc[0, "edition"] == 2018
-
-    # Vérifier la présence unique de chaque match_id
-    assert df_result["match_id"].is_unique
-    
-    # Vérification des match_id
-    assert list(df_result["match_id"]) == [1, 2]
-    
-    # Vérifier que les colonnes liées aux merges ne sont pas présentes
-    for col in ["team_homeid", "team_awayid", "group_group_id", "round_round_id", "stadium_id"]:
-        assert col not in df_result.columns
-
-    # --------------------
-    # Vérification de l'ordre des lignes
-    # --------------------
-    assert df_result["match_id"].tolist() == sorted(df_result["match_id"].tolist())
 
 
-# ##########   test-2022   ##################################################################
+def test_transform_2018_edition(sample_dfs_2018, sample_config_2018):
+    df = fct_transform_data_2018(sample_dfs_2018, sample_config_2018)
+
+    assert (df["edition"] == 2018).all()
+
+
+def test_transform_2018_match_id_uniqueness(sample_dfs_2018, sample_config_2018):
+    df = fct_transform_data_2018(sample_dfs_2018, sample_config_2018)
+
+    assert df["match_id"].is_unique
+    assert df["match_id"].tolist() == sorted(df["match_id"].tolist())
+
+
+def test_transform_2018_no_technical_columns(sample_dfs_2018, sample_config_2018):
+    df = fct_transform_data_2018(sample_dfs_2018, sample_config_2018)
+
+    forbidden_columns = [
+        "team_homeid",
+        "team_awayid",
+        "group_group_id",
+        "round_round_id",
+        "stadium_id"
+    ]
+
+    for col in forbidden_columns:
+        assert col not in df.columns
+
+
+def test_transform_2018_null_values(sample_dfs_2018_with_nulls, sample_config_2018):
+    df = fct_transform_data_2018(sample_dfs_2018_with_nulls, sample_config_2018)
+
+    assert "notdefined" in df.loc[1, "stage"]
+    assert not df.isna().any().any()
