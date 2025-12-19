@@ -2,15 +2,15 @@
 """
 Tests for the fct_transform_2010 function.
 """
-import pytest
+
 import sys
 from pathlib import Path
+import pytest
 import pandas as pd
-
 
 # Ajouter src au chemin Python
 sys.path.append(str(Path(__file__).resolve().parent.parent / "src"))
-from src.etl.transform import fct_transform_2010
+from etl.transform import fct_transform_2010
 
 
 @pytest.fixture
