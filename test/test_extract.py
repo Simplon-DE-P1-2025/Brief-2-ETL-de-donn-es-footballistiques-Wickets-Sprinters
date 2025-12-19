@@ -196,3 +196,4 @@ def test_fct_read_json_nested_knockout_part(tmp_path):
     assert len(bridge) == 2
     assert set(bridge["channel_id"]) == {"TF1", "beIN"}
     assert all(bridge["match_id"] == "FRA-CRO")
+
