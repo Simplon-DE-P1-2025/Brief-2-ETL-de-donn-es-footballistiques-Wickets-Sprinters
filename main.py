@@ -7,6 +7,7 @@ Goal:
     It utilizes functions from the eda.config module to load configurations.
     It utilizes functions from the eda.extract module to perform these tasks.
 """
+from dotenv import load_dotenv
 import pandas as pd  # pour la manipulation de DataFrames
 import os             # pour gérer les chemins et interactions système
 from pathlib import Path  # pour manipuler les chemins de fichiers de manière portable
@@ -17,17 +18,19 @@ from sqlalchemy import (
     MetaData, Table, Column,
     Integer, String, Date
     )
-from etl.extract import fct_read_csv, fct_read_json_nested
-from etl.transform import (
+from sqlalchemy.orm import sessionmaker
+
+from src.etl.extract import fct_read_csv, fct_read_json_nested
+from src.etl.transform import (
     fct_transform_2010,
     trf_file_wcup_2014,
     fct_transform_data_2018,
     transform_2022_data
     )
-from etl.load import create_postgres_engine
-from etl.utils import fct_load_config
+from src.etl.load import create_postgres_engine
+from src.etl.utils import fct_load_config
 
-
+load_dotenv()
 # chargement des paraètres de configuration à partir de ./config.yaml
 config_path = os.path.join(os.path.dirname(__file__), 'config.yaml')
 config = fct_load_config(config_path)
@@ -97,10 +100,10 @@ def main() -> None:
 
     # Load
     engine = create_postgres_engine(
-        host=os.getenv("HOST"),
-        database=os.getenv("DATABASE"),
-        user=os.getenv("USER"),
-        password=os.getenv("PASSWORD")
+        host=os.getenv("DB_HOST"),
+        database=os.getenv("DB_DATABASE"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD")
     )
 
     metadata = MetaData()
@@ -133,15 +136,15 @@ def main() -> None:
             method="multi"
         )
         session.commit()
-        print("✅ Données chargées avec succès dans la table 'matches'")
+        print("Données chargées avec succès dans la table 'matches'")
     except Exception as e:
         session.rollback()
-        print("❌ Erreur lors du chargement des données dans la base")
+        print("Erreur lors du chargement des données dans la base")
         print(f"Détails : {e}")
         raise
     finally:
         session.close()
-        print("🔒 Connexion à la base de données fermée")
+        print("Connexion à la base de données fermée")
 
 
 if __name__ == "__main__":

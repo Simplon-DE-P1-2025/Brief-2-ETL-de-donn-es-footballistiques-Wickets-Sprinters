@@ -48,10 +48,10 @@ Configuration
 3. **Connexion PostgreSQL** : créer un fichier `.env` à la racine avec :
 
    ```
-   HOST="votre_hote"
-   DATABASE="votre_base"
-   USER="votre_user"
-   PASSWORD="votre_mot_de_passe"
+   DB_HOST="votre_hote"
+   DB_DATABASE="votre_base"
+   DB_USER="votre_user"
+   DB_PASSWORD="votre_mot_de_passe"
    ```
 
    Ces variables sont utilisées dans `main.py` pour initialiser le moteur SQLAlchemy.
