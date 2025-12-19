@@ -29,7 +29,7 @@ def load_env(env_file: str = ".env") -> None:
 
     if not env_path.exists():
         raise FileNotFoundError(f"❌ .env file not found: {env_path}")
-    
+
     # load_dotenv(env_path)
 
 def fct_load_config(config_filename: str = "config.yaml") -> dict:

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Goal: 
     This module serves as the main entry point for the ETL process.
