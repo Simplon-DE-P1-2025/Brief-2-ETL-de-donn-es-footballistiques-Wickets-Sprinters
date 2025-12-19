@@ -8,6 +8,7 @@ Goal:
 """
 
 
+from dotenv import load_dotenv
 from src.etl.extract import fct_read_csv, fct_read_json_nested
 from src.etl.transform import fct_transform_2010,trf_file_wcup_2014, fct_transform_data_2018, transform_2022_data
 from src.etl.load import create_postgres_engine, select_to_dataframe, execute_query
@@ -34,9 +35,11 @@ root_csv_2014 = config['root_csv_2014']
 root_csv_2022 = config['root_csv_2022']
 root_json_2018 = config['root_json_2018']
 
+# Charger les variables d'environnement à partir du fichier .env
+load_dotenv() 
 host=os.getenv("HOST")
 database=os.getenv("DATABASE")
-user=os.getenv("USER")
+user=os.getenv("DB_USER")
 password=os.getenv("PASSWORD")
 
 # Display the first few rows of the consolidated DataFrame
@@ -67,15 +70,7 @@ def main() -> None:
     df_final = df_concat.sort_values("date").reset_index(drop=True)
     # Réincrémenter match_id
     df_final["match_id"] = range(1, len(df_final) + 1)
-    # print(df_final['match_id'].is_unique)
-    
-    
-    # print(df_final.tail(20))
-    
-    print(f"host: {host}")
-    print(f"database: {database}")
-    print(f"user: {user}")
-    print(f"password: {password}")
+
     # Load
     engine = create_postgres_engine(
         host=host,
