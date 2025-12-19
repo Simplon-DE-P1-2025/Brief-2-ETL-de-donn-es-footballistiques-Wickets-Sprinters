@@ -106,24 +106,13 @@ def test_fct_transform_2010_basic(sample_df_2010, sample_config):
 
 ##########   test-2014   ##################################################################
 
-<<<<<<< HEAD
 
 
 ##########   test-2018   ##################################################################
 # tests/test_transform_2018.py
 
-=======
 ##########   test-2018   ##################################################################
 # tests/test_transform_2018.py
-
-import pytest
-import pandas as pd
-from typing import Dict
-
-# Importer la fonction à tester
-from etl.transform import fct_transform_data_2018
-
->>>>>>> e35c46bc234325cc0cbb3c8596dd11891e30d161
 # --------------------
 # Fixtures
 # ============================================================================
