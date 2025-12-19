@@ -22,14 +22,23 @@ import numpy as np    # pour les opérations numériques avancées
 from sqlalchemy import (
     MetaData, Table, Column,
     Integer, String, Date
-)
+    )
+from src.etl.extract import fct_read_csv, fct_read_json_nested
+from src.etl.transform import (
+    fct_transform_2010,
+    trf_file_wcup_2014,
+    fct_transform_data_2018,
+    transform_2022_data
+    )
+from src.etl.load import create_postgres_engine
+from src.etl.utils import fct_load_config
 
-from sqlalchemy.orm import sessionmaker
 
-# Load configuration parameters from config.yaml
+# chargement des paraètres de configuration à partir de ./config.yaml
 config_path = os.path.join(os.path.dirname(__file__), 'config.yaml')
 config = fct_load_config(config_path)
 
+# Récupération des chemins vers les fichiers sources
 root_csv_2010 = config['root_csv_2010']
 root_csv_2014 = config['root_csv_2014']
 root_csv_2022 = config['root_csv_2022']
@@ -45,40 +54,64 @@ password=os.getenv("PASSWORD")
 # Display the first few rows of the consolidated DataFrame
 
 def main() -> None:
-    # extraction
+    """
+    Run the complete ETL pipeline.
 
+    This function performs the following steps:
+    1. Extract data from CSV and JSON source files.
+    2. Transform and normalize datasets for each World Cup edition.
+    3. Merge all datasets into a single consolidated DataFrame.
+    4. Generate a unique incremental match identifier.
+    5. Load the final dataset into a PostgreSQL database.
+
+    Environment variables required:
+    - HOST: database host
+    - DATABASE: database name
+    - USER: database user
+    - PASSWORD: database password
+
+    Returns
+    -------
+    None
+        This function does not return any value.
+        Data is loaded into the database.
+    """
+    # --------------------
+    # Extraction
+    # --------------------
     df_2010 = fct_read_csv(root_csv_2010)
     df_2014 = fct_read_csv(root_csv_2014)
     dfs_2018 = fct_read_json_nested(root_json_2018)
     df_2022 = fct_read_csv (root_csv_2022)
-    
-    
-    
-    # transform
+
+    # --------------------
+    # Transformation
+    # --------------------
     df_2010_clean = fct_transform_2010(df_2010, config)
     df_2014_clean = trf_file_wcup_2014(df_2014, config)
     df_2018_clean = fct_transform_data_2018(dfs_2018, config)
     df_2022_clean = transform_2022_data(df_2022, config)
 
-    
+    # --------------------
+    # Merge (concatenation verticale)
+    # --------------------
+    df_concat = pd.concat(
+        [df_2010_clean,df_2014_clean, df_2018_clean, df_2022_clean],
+        ignore_index=True)
 
-    # Merge (concaténation verticale)
-    df_concat = pd.concat([df_2010_clean,df_2014_clean, df_2018_clean, df_2022_clean], ignore_index=True)
-    # Vider la colonne match_id
+    # Reset and regenerate match_id
     df_concat["match_id"] = None
-    # Trier par date (ascendant)
     df_final = df_concat.sort_values("date").reset_index(drop=True)
-    # Réincrémenter match_id
     df_final["match_id"] = range(1, len(df_final) + 1)
 
     # Load
     engine = create_postgres_engine(
-        host=host,
-        database=database,
-        user=user,
-        password=password
+        host=os.getenv("HOST"),
+        database=os.getenv("DATABASE"),
+        user=os.getenv("USER"),
+        password=os.getenv("PASSWORD")
     )
-    
+
     metadata = MetaData()
 
     matches = Table(
@@ -99,7 +132,7 @@ def main() -> None:
 
     Session = sessionmaker(bind=engine)
     session = Session()
-
+    # Chargement des données dans la base
     try:
         df_final.to_sql(
             "matches",
@@ -109,11 +142,15 @@ def main() -> None:
             method="multi"
         )
         session.commit()
+        print("✅ Données chargées avec succès dans la table 'matches'")
     except Exception as e:
         session.rollback()
+        print("❌ Erreur lors du chargement des données dans la base")
+        print(f"Détails : {e}")
         raise
     finally:
         session.close()
+        print("🔒 Connexion à la base de données fermée")
 
 
 if __name__ == "__main__":

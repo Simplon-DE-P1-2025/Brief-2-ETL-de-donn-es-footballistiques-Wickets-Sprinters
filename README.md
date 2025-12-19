@@ -5,6 +5,11 @@ Ce dépôt contient un pipeline ETL complet qui consolide les matchs des Coupes 
 
 Ce projet a été réalisé dans le cadre du deuxième brief de la formation Data Engineer par Ahmed SKANJI, Alexandre SEVERIEN, Ashley DE HEIDEN et Kaouter RHAZLANI.
 
+Architecture Globale
+-------------------
+![alt text](Sans-titre-2025-04-04-1326.png)
+
+
 Structure du projet
 -------------------
 
@@ -13,11 +18,10 @@ Structure du projet
 - `src/etl/extract.py` : lecture robuste de CSV et JSON imbriqués, y compris le parsing spécifique du JSON 2018.
 - `src/etl/transform.py` : fonctions dédiées à chaque millésime (2010, 2014, 2018, 2022) pour normaliser les colonnes, nettoyer les valeurs et fabriquer des identifiants de match cohérents.
 - `src/etl/load.py` & `src/etl/utils.py` : création du moteur SQLAlchemy, exécution des requêtes et helpers génériques (chargement de config, nettoyage des chaînes, conversions de dates...).
-- `data/` : sources brutes.
-  - `matches_19302010.csv` – historique 1930-2010 : https://drive.google.com/drive/folders/1aIdxDo7P8gup-F9VYGirh6mBuxx5Dc5K
-  - `WorldCupMatches2014.csv` – Coupe du Monde 2014 : https://drive.google.com/drive/folders/1aIdxDo7P8gup-F9VYGirh6mBuxx5Dc5K
-  - `data_2018.json` – Coupe du Monde 2018 (structure imbriquée) : https://drive.google.com/drive/folders/1aIdxDo7P8gup-F9VYGirh6mBuxx5Dc5K
-  - `Fifa_world_cup_matches.csv` – Coupe du Monde 2022 (dataset Kaggle : <https://www.kaggle.com/datasets/die9origephit/fifa-world-cup-2022-complete-dataset>).
+- `data/` : Données sources
+  - `matches_19302010.csv` – historique 1930-2010, `WorldCupMatches2014.csv` – Coupe du Monde 2014
+`data_2018.json` – Coupe du Monde 2018 https://drive.google.com/drive/folders/1aIdxDo7P8gup-F9VYGirh6mBuxx5Dc5K
+  - `Fifa_world_cup_matches.csv` – Coupe du Monde 2022 (dataset Kaggle : <https://www.kaggle.com/datasets/die9origephit/fifa-world-cup-2022-complete-dataset>)
 - `notebook/` et `src/eda/` : notebooks d’extraction/EDA pour comprendre les jeux de données et tester les transformations avant industrialisation.
 - `.env` : variables de connexion PostgreSQL (voir exemple ci-dessous).
 
