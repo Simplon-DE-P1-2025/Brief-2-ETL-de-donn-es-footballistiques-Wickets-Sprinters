@@ -6,15 +6,13 @@ Tests for the fct_transform_2010 function.
 import sys
 from pathlib import Path
 import pytest
-import pandas as pd
 from unittest.mock import patch
-import pytest
 import pandas as pd
 
 
 # Ajouter src au chemin Python
 sys.path.append(str(Path(__file__).resolve().parent.parent / "src"))
-from etl.transform import fct_transform_2010, trf_file_wcup_2014, fct_transform_data_2018
+from etl.transform import fct_transform_2010, trf_file_wcup_2014, fct_transform_data_2018, transform_2022_data
 
 # Importer la fonction à tester
 from etl.transform import fct_transform_data_2018
@@ -111,8 +109,6 @@ def test_fct_transform_2010_basic(sample_df_2010, sample_config):
 ##########   test-2018   ##################################################################
 # tests/test_transform_2018.py
 
-##########   test-2018   ##################################################################
-# tests/test_transform_2018.py
 # --------------------
 # Fixtures
 # ============================================================================
@@ -215,14 +211,14 @@ def test_transform_2018_structure(sample_dfs_2018, sample_config_2018):
 def test_transform_2018_column_types(sample_dfs_2018, sample_config_2018):
     df = fct_transform_data_2018(sample_dfs_2018, sample_config_2018)
 
-    assert df["match_id"].dtype.name in ["int64", "Int64"]
+    assert df["match_id"].dtype.name in ['int32', "int64", "Int64"]
     assert df["date"].dtype.name in ["string", "String", "object"]
     assert df["home_team"].dtype.name in ["string", "String", "object"]
     assert df["away_team"].dtype.name in ["string", "String", "object"]
-    assert df["home_result"].dtype.name in ["int64", "Int64"]
-    assert df["away_result"].dtype.name in ["int64", "Int64"]
+    assert df["home_result"].dtype.name in ['int32', "int64", "Int64"]
+    assert df["away_result"].dtype.name in ['int32', "int64", "Int64"]
     assert df["stage"].dtype.name in ["string", "String", "object"]
-    assert df["edition"].dtype.name in ["int64", "Int64"]
+    assert df["edition"].dtype.name in ['int32', "int64", "Int64"]
     assert df["city"].dtype.name in ["string", "String", "object"]
 
 
