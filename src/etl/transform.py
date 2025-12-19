@@ -13,7 +13,8 @@ from etl.utils import (
     fct_lower_string_columns,
     fct_upper_string_columns,
     fct_capitalize_string_columns,
-    fct_fillna_and_convert_types
+    fct_fillna_and_convert_types,
+    clean_string_column
     )
 from pyparsing import col
 
@@ -222,7 +223,11 @@ def fct_transform_data_2018(dfs_2018 : Dict[str, pd.DataFrame] , config: Dict) -
     
     #supprimer '.' à la fin des noms des villes
     df_stadiums_transformed['city'] = df_stadiums_transformed['city'].str.replace(r'\.$', '', regex=True)
-
+    
+    # Nettoyer les colonnes string (accents, espaces, etc.)
+    df_stadiums_transformed =clean_string_column(df_stadiums_transformed, 'city')
+    df_stadiums_transformed =clean_string_column(df_stadiums_transformed, 'name')
+    
     # Mettre en le premier caractère en Majuscule pour les colonnes name et city & convertir en type string
     df_stadiums_transformed = fct_capitalize_string_columns(df_stadiums_transformed, ['name', 'city'])
     
@@ -235,6 +240,9 @@ def fct_transform_data_2018(dfs_2018 : Dict[str, pd.DataFrame] , config: Dict) -
     
     #traitement des valeurs nulles
     df_teams_transformed = fct_fillna_and_convert_types(df_teams_transformed)
+    
+    # Nettoyer les colonnes string (accents, espaces, etc.)
+    df_teams_transformed = clean_string_column(df_teams_transformed, 'name')
     
     # Mettre en le premier caractère en Majuscule pour la colonne name & convertir en type string
     df_teams_transformed = fct_capitalize_string_columns(df_teams_transformed, ['name'])

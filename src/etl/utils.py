@@ -9,6 +9,9 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 from typing import Optional, Union, Dict, List
+import pandas as pd
+import unidecode  
+import re         
 
 
 def fct_load_config(config_filename: str = "config.yaml") -> dict:
@@ -322,10 +325,57 @@ def fct_harmonize_column_values(
     if col not in df.columns:
         print(f"La colonne '{col}' n'existe pas dans le DataFrame.")
         return df
-
+        
     df[col] = df[col].apply(lambda x: mapping_dict.get(x, x) if pd.notnull(x) else x)
 
     return df
+
+
+
+def clean_string_column(df: pd.DataFrame, col: str, rename_dict: dict = None) -> pd.DataFrame:
+    """
+    Nettoie une colonne de type string/object d'un DataFrame.
+
+    Nettoyage effectué :
+    - Conversion en minuscules
+    - Suppression des accents
+    - Suppression des espaces superflus
+    - Renommage via dictionnaire si fourni
+
+    Paramètres :
+        df (pd.DataFrame) : DataFrame d'entrée
+        col (str) : nom de la colonne à nettoyer
+        rename_dict (dict, optionnel) : dictionnaire de renommage, ex: {"Manchester Utd": "Manchester United"}
+
+    Retour :
+        pd.DataFrame : DataFrame avec la colonne nettoyée
+    """
+    # Copier le DataFrame pour ne pas modifier l'original
+    df_clean = df.copy()
+    
+    # Vérifier que la colonne existe
+    if col not in df_clean.columns:
+        raise ValueError(f"La colonne '{col}' n'existe pas dans le DataFrame")
+    
+    # Convertir en string, enlever les espaces avant/après et mettre en minuscules
+    df_clean[col] = df_clean[col].astype(str).str.strip().str.lower()
+    
+    # Supprimer les accents
+    df_clean[col] = df_clean[col].apply(unidecode.unidecode)
+    
+    # Remplacer les multiples espaces par un seul
+    df_clean[col] = df_clean[col].apply(lambda x: re.sub(r'\s+', ' ', x))
+    
+    #remplacer '-' par ' '
+    df_clean[col] = df_clean[col].str.replace('-', ' ')
+    
+    # Appliquer le dictionnaire de renommage si fourni
+    if rename_dict:
+        df_clean[col] = df_clean[col].replace(rename_dict)
+    
+    # Retourner le DataFrame nettoyé
+    return df_clean
+
 
 def fct_fillna_and_convert_types(
     df: pd.DataFrame,
