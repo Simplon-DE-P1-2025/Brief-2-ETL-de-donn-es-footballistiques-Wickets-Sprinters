@@ -1,4 +1,4 @@
-import pandas as pd 
+import pandas as pd
 from typing import Optional, Union, Dict, List, Any
 import re
 import numpy as np

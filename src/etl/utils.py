@@ -2,6 +2,7 @@
 """
 Goal: This file serves to define main functions to load configuration parameters.
 """
+import os
 import re
 import yaml
 from pathlib import Path
@@ -12,28 +13,31 @@ from typing import Optional, Union, Dict, List
 
 def fct_load_config(config_filename: str = "config.yaml") -> dict:
     """
-    Objectif :
-        Charger les paramètres de configuration depuis un fichier YAML.
-    Paramètres :
-        config_filename (str) : Chemin relatif ou absolu du fichier YAML.
-    Retour :
-        dict : Paramètres de configuration.
+    Charge le fichier YAML de config.
+
+    Fonction compatible script et notebook, chemins relatifs ou absolus.
     """
+    from pathlib import Path
+    import os, yaml
+
     config_path = Path(config_filename)
 
-    # Résoudre le chemin relatif depuis la racine du projet
-    if not config_path.is_absolute():
-        project_root = Path(__file__).resolve().parents[1]
-        config_path = project_root / config_path
+    # Si chemin absolu, on l'utilise directement
+    if config_path.is_absolute():
+        final_path = config_path
+    else:
+        # Utiliser le répertoire courant pour les chemins relatifs
+        if "__file__" in globals():
+            base_dir = Path(__file__).parent.parent  # src/
+        else:
+            base_dir = Path(os.getcwd())
+        final_path = base_dir / config_path
 
-    if not config_path.exists():
-        raise FileNotFoundError(f"Fichier de configuration introuvable : {config_path}")
+    if not final_path.exists():
+        raise FileNotFoundError(f"❌ Config file not found: {final_path}")
 
-    # Charger le fichier YAML
-    with open(config_path, "r", encoding="utf-8") as f:
-        config = yaml.safe_load(f)
-
-    return config
+    with open(final_path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
 
 def normalize_datetime(x: Union[str, pd.Timestamp]) -> Optional[str]:
     """
@@ -53,7 +57,9 @@ def normalize_datetime(x: Union[str, pd.Timestamp]) -> Optional[str]:
     """
     try:
         # Conversion en datetime pandas (gestion automatique de plusieurs formats)
-        dt = pd.to_datetime(x, dayfirst=True)
+        dt = pd.to_datetime(x, dayfirst=False, errors="coerce")
+        if pd.isna(dt):
+            dt = pd.to_datetime(x, dayfirst=True, errors="coerce")
 
         # Formatage final en YYYYMMDDhhmmss
         return dt.strftime("%Y%m%d%H%M%S")

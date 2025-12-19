@@ -5,79 +5,6 @@ import pandas as pd
 import os
 import yaml
 from pathlib import Path
-from dotenv import load_dotenv
-
-load_dotenv(r"C:\Users\DELL\Documents\vscode_simplon\Brief-2-ETL-de-donn-es-footballistiques-Wickets-Sprinters\.env")
-
-def load_env(env_file: str = ".env") -> None:
-    """
-    Load environment variables from a .env file.
-    Works in both script and notebook environments.
-    """
-
-    env_path = Path(env_file)
-
-    if not env_path.is_absolute():
-        # Script
-        if "__file__" in globals():
-            project_root = Path(__file__).resolve().parents[1]
-        # Notebook
-        else:
-            project_root = Path.cwd()
-
-        env_path = project_root / env_path
-
-    if not env_path.exists():
-        raise FileNotFoundError(f"❌ .env file not found: {env_path}")
-
-    # load_dotenv(env_path)
-
-def fct_load_config(config_filename: str = "config.yaml") -> dict:
-    """
-    Goal
-    ----
-    Load configuration parameters from a YAML file.
-
-    This function works both in:
-    - Python scripts
-    - Jupyter notebooks (where __file__ is not defined)
-
-    Parameters
-    ----------
-    config_filename : str
-        Relative or absolute path to the YAML configuration file.
-
-    Returns
-    -------
-    dict
-        Dictionary containing configuration parameters.
-    """
-
-    config_path = Path(config_filename)
-
-    # Cas 1 : chemin absolu → on l'utilise directement
-    if config_path.is_absolute():
-        final_path = config_path
-
-    else:
-        # Cas 2 : Script Python (__file__ existe)
-        if "__file__" in globals():
-            project_root = Path(__file__).resolve().parents[1]
-
-        # Cas 3 : Notebook Jupyter (__file__ n'existe pas)
-        else:
-            project_root = Path(os.getcwd())
-
-        final_path = project_root / config_path
-
-    if not final_path.exists():
-        raise FileNotFoundError(f"❌ Config file not found: {final_path}")
-
-    with open(final_path, "r", encoding="utf-8") as f:
-        config = yaml.safe_load(f)
-
-    return config
-
 
 def create_postgres_engine(
     host: str,
@@ -114,7 +41,7 @@ def create_postgres_engine(
         )
         return engine
     except Exception as e:
-        print(f"❌ Erreur de création du moteur SQLAlchemy : {e}")
+        print(f"Erreur de création du moteur SQLAlchemy : {e}")
         return None
 
 
@@ -153,7 +80,7 @@ def execute_query(
         with engine.begin() as conn:  # commit automatique
             conn.execute(text(query), params or {})
     except Exception as e:
-        print(f"❌ Erreur SQL : {e}")
+        print(f"Erreur SQL : {e}")
 
 
 def dataframe_to_table(

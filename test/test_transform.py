@@ -7,10 +7,11 @@ import sys
 from pathlib import Path
 import pytest
 import pandas as pd
+from unittest.mock import patch
 
 # Ajouter src au chemin Python
 sys.path.append(str(Path(__file__).resolve().parent.parent / "src"))
-from etl.transform import fct_transform_2010
+from etl.transform import fct_transform_2010, trf_file_wcup_2014, fct_transform_data_2018
 
 ##########   test-2010   ##################################################################
 
@@ -100,17 +101,9 @@ def test_fct_transform_2010_basic(sample_df_2010, sample_config):
 ##########   test-2014   ##################################################################
 
 
+
 ##########   test-2018   ##################################################################
 # tests/test_transform_2018.py
-
-import pytest
-import pandas as pd
-from typing import Dict
-
-# Importer la fonction à tester
-from etl.transform import fct_transform_data_2018
-import pytest
-import pandas as pd
 
 # --------------------
 # Fixtures
@@ -211,6 +204,7 @@ def test_fct_transform_data_2018_basic(sample_dfs_2018, sample_config_2018):
     assert df_result["home_result"].dtype.name in ["int64", "Int64"]
     assert df_result["away_result"].dtype.name in ["int64", "Int64"]
     assert df_result["stage"].dtype.name in ["string","String", "object"]
+    assert df_result["edition"].dtype.name in ["int64", "Int64"]
     assert df_result["edition"].dtype.name in ["int64", "Int64"]
     assert df_result["city"].dtype.name in ["string","String", "object"]
 
