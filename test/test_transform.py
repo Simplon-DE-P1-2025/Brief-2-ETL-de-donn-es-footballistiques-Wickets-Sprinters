@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 # Ajouter src au chemin Python
 sys.path.append(str(Path(__file__).resolve().parent.parent / "src"))
-from etl.transform import fct_transform_2010, trf_file_wcup_2014, fct_transform_data_2018
+from etl.transform import fct_transform_2010, trf_file_wcup_2014, fct_transform_data_2018, transform_2022_data
 
 ##########   test-2010   ##################################################################
 
@@ -100,24 +100,11 @@ def test_fct_transform_2010_basic(sample_df_2010, sample_config):
 
 ##########   test-2014   ##################################################################
 
-<<<<<<< HEAD
 
 
 ##########   test-2018   ##################################################################
 # tests/test_transform_2018.py
 
-=======
-##########   test-2018   ##################################################################
-# tests/test_transform_2018.py
-
-import pytest
-import pandas as pd
-from typing import Dict
-
-# Importer la fonction à tester
-from etl.transform import fct_transform_data_2018
-
->>>>>>> e35c46bc234325cc0cbb3c8596dd11891e30d161
 # --------------------
 # Fixtures
 # --------------------
@@ -284,3 +271,137 @@ def test_fct_transform_data_2018_basic(sample_dfs_2018, sample_config_2018):
 
 
 # ##########   test-2022   ##################################################################
+
+# --------------------
+# Fixtures
+# --------------------
+@pytest.fixture
+def config_2022():
+    return {
+        "stage_mapping_2022": {
+            "Group": "group",
+            "Knockout": "knockout",
+        }
+    }
+
+
+@pytest.fixture
+def raw_matches_2022_df():
+    return pd.DataFrame(
+        {
+            "team1": ["france", "argentina"],
+            "team2": ["brazil", "  germany  "],
+            "number of goals team1": ["2", "x"],
+            "number of goals team2": ["1", "3"],
+            "date": ["02 Jan 2022", "01 Jan 2022"],
+            "hour": ["17 : 00", "09:05"],
+            "category": ["Group", "Knockout"],
+            "unused": ["foo", "bar"],  # doit être ignorée
+        }
+    )
+
+
+# --------------------
+# Tests transform_2022_data
+# --------------------
+def test_transform_2022_data_happy_path(raw_matches_2022_df, config_2022):
+    out = transform_2022_data(raw_matches_2022_df, config_2022)
+
+    assert isinstance(out, pd.DataFrame)
+    assert list(out.columns) == [
+        "match_id",
+        "date",
+        "home_team",
+        "away_team",
+        "home_result",
+        "away_result",
+        "stage",
+        "edition",
+        "city",
+    ]
+
+    # tri par date
+    assert out.iloc[0]["date"] == "20220101090500"
+    assert out.iloc[1]["date"] == "20220102170000"
+
+    # match_id après tri
+    assert list(out["match_id"]) == [1, 2]
+
+    # normalisation équipes
+    assert out.iloc[0]["home_team"] == "Argentina"
+    assert out.iloc[0]["away_team"] == "Germany"
+    assert out.iloc[1]["home_team"] == "France"
+    assert out.iloc[1]["away_team"] == "Brazil"
+
+    # stage mapping
+    assert set(out["stage"]) == {"group", "knockout"}
+
+    # edition
+    assert set(out["edition"]) == {2022}
+
+    # city
+    assert out["city"].isna().all()
+
+    # types scores
+    assert str(out["home_result"].dtype) == "Int64"
+    assert str(out["away_result"].dtype) == "Int64"
+
+
+def test_transform_2022_data_non_numeric_scores_become_na(raw_matches_2022_df, config_2022):
+    out = transform_2022_data(raw_matches_2022_df, config_2022)
+
+    # la ligne avec "x" devient la première après tri
+    assert pd.isna(out.iloc[0]["home_result"])
+    assert out.iloc[0]["away_result"] == 3
+
+
+def test_transform_2022_data_invalid_datetime_results_in_nan_date(config_2022):
+    df = pd.DataFrame(
+        {
+            "team1": ["France"],
+            "team2": ["Brazil"],
+            "number of goals team1": ["1"],
+            "number of goals team2": ["0"],
+            "date": ["99 Foo 2022"],  # invalide
+            "hour": ["17:00"],
+            "category": ["Group"],
+        }
+    )
+
+    out = transform_2022_data(df, config_2022)
+
+    assert pd.isna(out.loc[0, "date"])
+
+
+def test_transform_2022_data_raises_when_missing_required_columns(config_2022):
+    df_missing = pd.DataFrame(
+        {
+            "team1": ["France"],
+            "number of goals team1": ["1"],
+            "number of goals team2": ["0"],
+            "date": ["01 Jan 2022"],
+            "hour": ["17:00"],
+            "category": ["Group"],
+        }
+    )
+
+    with pytest.raises(KeyError):
+        transform_2022_data(df_missing, config_2022)
+
+
+def test_transform_2022_data_stage_mapping_keeps_unknown_values(config_2022):
+    df = pd.DataFrame(
+        {
+            "team1": ["France"],
+            "team2": ["Brazil"],
+            "number of goals team1": ["1"],
+            "number of goals team2": ["0"],
+            "date": ["01 Jan 2022"],
+            "hour": ["17 : 00"],
+            "category": ["Friendly"],  # pas dans le mapping
+        }
+    )
+
+    out = transform_2022_data(df, config_2022)
+
+    assert out.loc[0, "stage"] == "Friendly"

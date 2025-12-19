@@ -400,7 +400,7 @@ def transform_2022_data(df: pd.DataFrame , config: dict) -> pd.DataFrame:
     # errors="coerce"
     # )
     dt = pd.to_datetime(
-        df_filtered["date"].astype(str).str.strip() + " " + df_filtered["hour"].astype(str).str.strip(),
+        df_filtered["date"].astype("string").str.strip() + " " + df_filtered["hour"].astype(str).str.strip(),
         format="%d %b %Y %H:%M",  # exemple : '01 Jan 2022 15:30'
         errors="coerce",
         dayfirst=True  # si ton format est jour/mois/année
@@ -425,7 +425,7 @@ def transform_2022_data(df: pd.DataFrame , config: dict) -> pd.DataFrame:
     df_filtered.sort_values("date", inplace=True)
     # Réinitialiser l'index incrémental pour match_id
     df_filtered["match_id"] = range(1, len(df_filtered) + 1)
-    df_filtered['edition'] = df_filtered['date'].str[:4].astype(int)
+    df_filtered['edition'] = df_filtered['date'].str[:4].astype("Int64")
     df_filtered["city"] = None
     
     # Réorganisation des colonnes du DataFrame
