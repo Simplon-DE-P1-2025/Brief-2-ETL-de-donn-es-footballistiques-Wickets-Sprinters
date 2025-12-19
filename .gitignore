@@ -1,7 +1,7 @@
 *.csv
 .venv
 .ipynb
-requirements.txt
+# requirements.txt
 __pycache__/
 data/
 .vscode
