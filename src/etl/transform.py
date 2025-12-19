@@ -65,7 +65,7 @@ def fct_transform_2010(df : pd.DataFrame , config : Dict) -> pd.DataFrame:
     df["date"] = df["date"].astype("string")
 
     #garder que l'année pour 'edition'
-    df['edition'] =df['date'].astype(int)
+    df['edition'] =df['date'].astype("Int64")
     
     #supprimer '.' dans colonne 'city'
     df['city'] = df['city'].str.replace('.', '', regex=False)
@@ -400,7 +400,7 @@ def transform_2022_data(df: pd.DataFrame , config: dict) -> pd.DataFrame:
     # errors="coerce"
     # )
     dt = pd.to_datetime(
-        df_filtered["date"].astype("string").str.strip() + " " + df_filtered["hour"].astype(str).str.strip(),
+        df_filtered["date"].astype("string").str.strip() + " " + df_filtered["hour"].astype("string").str.strip(),
         format="%d %b %Y %H:%M",  # exemple : '01 Jan 2022 15:30'
         errors="coerce",
         dayfirst=True  # si ton format est jour/mois/année
