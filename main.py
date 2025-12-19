@@ -1,16 +1,25 @@
 # -*- coding: utf-8 -*-
 """
-This module serves as the main entry point for the ETL process.
-It reads configuration parameters, extracts data from multiple sources,
-and consolidates them into a single DataFrame.
-It utilizes functions from the config module to load configurations.
-It utilizes functions from the etl.extract, etl.transform,
-etl.load and etl.utils modules to perform these tasks.
+Goal: 
+    This module serves as the main entry point for the ETL process.
+    It reads configuration parameters, extracts data from multiple sources,
+    and consolidates them into a single DataFrame.
+    It utilizes functions from the eda.config module to load configurations.
+    It utilizes functions from the eda.extract module to perform these tasks.
 """
 
-import os
-import pandas as pd
-from sqlalchemy.orm import sessionmaker
+
+from dotenv import load_dotenv
+from src.etl.extract import fct_read_csv, fct_read_json_nested
+from src.etl.transform import fct_transform_2010,trf_file_wcup_2014, fct_transform_data_2018, transform_2022_data
+from src.etl.load import create_postgres_engine, select_to_dataframe, execute_query
+from src.etl.utils import fct_load_config
+import pandas as pd  # pour la manipulation de DataFrames
+import os             # pour gérer les chemins et interactions système
+from pathlib import Path  # pour manipuler les chemins de fichiers de manière portable
+from typing import Dict   # pour typer les dictionnaires dans les fonctions
+import numpy as np    # pour les opérations numériques avancées
+
 from sqlalchemy import (
     MetaData, Table, Column,
     Integer, String, Date
@@ -35,6 +44,15 @@ root_csv_2010 = config['root_csv_2010']
 root_csv_2014 = config['root_csv_2014']
 root_csv_2022 = config['root_csv_2022']
 root_json_2018 = config['root_json_2018']
+
+# Charger les variables d'environnement à partir du fichier .env
+load_dotenv() 
+host=os.getenv("HOST")
+database=os.getenv("DATABASE")
+user=os.getenv("DB_USER")
+password=os.getenv("PASSWORD")
+
+# Display the first few rows of the consolidated DataFrame
 
 def main() -> None:
     """
@@ -87,9 +105,7 @@ def main() -> None:
     df_final = df_concat.sort_values("date").reset_index(drop=True)
     df_final["match_id"] = range(1, len(df_final) + 1)
 
-    # --------------------
-    # Load (PostgreSQL)
-    # --------------------
+    # Load
     engine = create_postgres_engine(
         host=os.getenv("HOST"),
         database=os.getenv("DATABASE"),

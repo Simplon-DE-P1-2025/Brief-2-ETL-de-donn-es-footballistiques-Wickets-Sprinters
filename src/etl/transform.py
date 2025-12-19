@@ -214,6 +214,8 @@ def fct_transform_data_2018(dfs_2018 : Dict[str, pd.DataFrame] , config: Dict) -
     # Filtrer les colonnes nécessaires
     columns_to_keep = ['id', 'name', 'city']
     df_stadiums_transformed = df_stadiums[columns_to_keep].copy()
+    df_stadiums_transformed['city'] = df_stadiums_transformed['city'].str.replace(r'\.$', '', regex=True)
+
 
     # Mettre en le premier caractère en Majuscule pour les colonnes name et city & convertir en type string
     df_stadiums_transformed = fct_capitalize_string_columns(df_stadiums_transformed, ['name', 'city'])

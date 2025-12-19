@@ -239,7 +239,7 @@ def fct_extract_edition(df: pd.DataFrame, col: str) -> pd.DataFrame:
     Retour :
         pd.DataFrame : DataFrame avec nouvelle colonne année
     """
-    df['edition'] = df[col].str[:4]
+    df['edition'] = df[col].str[:4].astype(int)
     return df
 
 def fct_generate_unique_stage(
