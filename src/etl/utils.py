@@ -1,13 +1,14 @@
+# -*- coding: utf-8 -*-
 """
 Goal: This file serves to define main functions to load configuration parameters.
 """
-import pandas as pd
-from typing import Optional, Union, Dict, List, Any
 import re
-import numpy as np
 import yaml
 from pathlib import Path
-from pyparsing import col
+import pandas as pd
+import numpy as np
+from typing import Optional, Union, Dict, List
+
 
 def fct_load_config(config_filename: str = "config.yaml") -> dict:
     """
@@ -104,21 +105,6 @@ def test_country_column(df: pd.DataFrame, column: str) -> Dict[str, List[str]]:
                 issues["special_chars"].append(val_str)
 
     return issues
-
-def fct_add_prefix_to_df(df: pd.DataFrame, prefix: str) -> pd.DataFrame:
-    """
-    Objectif :
-        Ajouter un préfixe à toutes les colonnes d'un DataFrame.
-    Paramètres :
-        df (pd.DataFrame) : DataFrame d'entrée.
-        prefix (str) : Préfixe à ajouter.
-    Retour :
-        pd.DataFrame : DataFrame avec les noms de colonnes modifiés.
-    """
-    for col in df.columns:
-        df.rename(columns={col: f"{prefix}_{col}"}, inplace=True)
-    return df
-
 
 def fct_capitalize_string_columns(df: pd.DataFrame, cols: list = None) -> pd.DataFrame:
     """

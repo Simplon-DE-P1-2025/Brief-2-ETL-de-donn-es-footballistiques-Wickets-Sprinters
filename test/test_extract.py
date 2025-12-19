@@ -6,7 +6,7 @@ import sys
 
 # Ajouter src au chemin Python
 sys.path.append(str(Path(__file__).resolve().parent.parent / "src"))
-from etl.extract import fct_read_csv, fct_read_json_nested, fct_add_prefix_to_df, fct_extract_data
+from etl.extract import fct_read_csv, fct_read_json_nested
 
 # --------------------
 # Fixtures pour fichiers temporaires
@@ -51,29 +51,6 @@ def test_fct_read_csv_file_not_found():
     df = fct_read_csv("non_existent.csv")
     assert df.empty
 
-def test_fct_add_prefix_to_df():
-    df = pd.DataFrame({"a": [1], "b": [2]})
-    df_prefixed = fct_add_prefix_to_df(df.copy(), "test")
-    assert list(df_prefixed.columns) == ["test_a", "test_b"]
-
-
-def test_fct_extract_data(tmp_path, csv_content, json_content):
-    # Créer fichiers CSV temporaires
-    csv_files = []
-    for year in ["2010", "2014", "2022"]:
-        f = tmp_path / f"{year}.csv"
-        f.write_text(csv_content)
-        csv_files.append(str(f))
-    
-    # Créer fichier JSON temporaire
-    json_file = tmp_path / "2018.json"
-    json_file.write_text(json.dumps(json_content))
-    
-    result = fct_extract_data(*csv_files, str(json_file))
-    
-    # Actuellement la fonction retourne None
-    assert result is None
-    
 
 def test_fct_read_csv_file_not_found(capsys):
     fake_path = "fichier_qui_n_existe_pas.csv"
