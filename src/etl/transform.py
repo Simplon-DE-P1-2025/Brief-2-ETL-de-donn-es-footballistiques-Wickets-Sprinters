@@ -2,7 +2,7 @@ import pandas as pd
 from typing import Optional, Union, Dict, List, Any
 import re
 import numpy as np
-from etl.utils import (
+from src.etl.utils import (
     normalize_datetime,
     test_country_column,
     fct_harmonize_column_values,
@@ -159,7 +159,7 @@ def trf_file_wcup_2014(df: pd.DataFrame, config: Dict[str, Any]) -> pd.DataFrame
     )
 
     # Création d’une colonne date normalisée
-    df_2014_news["date"] = df_2014_news["date"].apply(normalize_datetime)
+    df_2014_news["date"] = df_2014_news["datetime"].apply(normalize_datetime)
 
     # Récupérer le valeurs distinctes de la colonne stage
     df_2014_news["stage"].unique()

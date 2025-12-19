@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 from typing import Optional, Union, Dict, List
 import pandas as pd
-import unidecode  
+import unidecode
 import re         
 
 

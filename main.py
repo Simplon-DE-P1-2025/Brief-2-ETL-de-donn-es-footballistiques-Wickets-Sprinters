@@ -18,6 +18,8 @@ from sqlalchemy import (
     MetaData, Table, Column,
     Integer, String, Date
     )
+from sqlalchemy.orm import sessionmaker
+
 from src.etl.extract import fct_read_csv, fct_read_json_nested
 from src.etl.transform import (
     fct_transform_2010,
@@ -27,7 +29,6 @@ from src.etl.transform import (
     )
 from src.etl.load import create_postgres_engine
 from src.etl.utils import fct_load_config
-
 
 load_dotenv()
 # chargement des paraètres de configuration à partir de ./config.yaml
@@ -100,10 +101,10 @@ def main() -> None:
 
     # Load
     engine = create_postgres_engine(
-        host=os.getenv("HOST"),
-        database=os.getenv("DATABASE"),
-        user=os.getenv("USER_DB"),
-        password=os.getenv("PASSWORD")
+        host=os.getenv("DB_HOST"),
+        database=os.getenv("DB_DATABASE"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD")
     )
 
     metadata = MetaData()
@@ -136,15 +137,15 @@ def main() -> None:
             method="multi"
         )
         session.commit()
-        print("✅ Données chargées avec succès dans la table 'matches'")
+        print("Données chargées avec succès dans la table 'matches'")
     except Exception as e:
         session.rollback()
-        print("❌ Erreur lors du chargement des données dans la base")
+        print("Erreur lors du chargement des données dans la base")
         print(f"Détails : {e}")
         raise
     finally:
         session.close()
-        print("🔒 Connexion à la base de données fermée")
+        print("Connexion à la base de données fermée")
 
 
 if __name__ == "__main__":

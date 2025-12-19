@@ -112,7 +112,7 @@ def sample_config_2014():
     return {
         'trf_file_wcup_2014': {       
             'colonnes_retenues': [
-                'date', 'home_team', 'away_team', 'home_result', 'away_result', 'stage', 'edition', 'city'
+                'Datetime', 'home_team', 'away_team', 'home_result', 'away_result', 'stage', 'edition', 'city'
             ],
             'news_columns': {  # mapping colonnes originales -> standard
                 'home_team': 'home_team',
@@ -138,7 +138,7 @@ def sample_config_2014():
 def sample_df_2014():
     """Fixture : DataFrame échantillon pour le dataset 2014."""
     return pd.DataFrame({
-        'date': ['2014-06-12', '2014-07-13'],
+        'Datetime': ['2014-06-12', '2014-07-13'],
         'home_team': ['Brasil', 'Deutschland'],
         'away_team': ['Croatia', 'Argentina'],
         'home_result': [3, 1],
