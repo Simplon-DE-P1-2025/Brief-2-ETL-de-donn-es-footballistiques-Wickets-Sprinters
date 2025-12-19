@@ -12,7 +12,8 @@ from etl.utils import (
     fct_iso_to_yyyymmddhhmmss,
     fct_lower_string_columns,
     fct_upper_string_columns,
-    fct_capitalize_string_columns
+    fct_capitalize_string_columns,
+    fct_fillna_and_convert_types
     )
 from pyparsing import col
 
@@ -157,7 +158,7 @@ def trf_file_wcup_2014(df: pd.DataFrame, config: Dict[str, Any]) -> pd.DataFrame
     )
 
     # Création d’une colonne date normalisée
-    df_2014_news["date"] = df_2014_news["datetime"].apply(normalize_datetime)
+    df_2014_news["date"] = df_2014_news["date"].apply(normalize_datetime)
 
     # Récupérer le valeurs distinctes de la colonne stage
     df_2014_news["stage"].unique()
@@ -211,11 +212,16 @@ def fct_transform_data_2018(dfs_2018 : Dict[str, pd.DataFrame] , config: Dict) -
     #-------------------------------------------------------------------------
     #------------------------stadiums transformations #------------------------
     #-------------------------------------------------------------------------
+
     # Filtrer les colonnes nécessaires
     columns_to_keep = ['id', 'name', 'city']
     df_stadiums_transformed = df_stadiums[columns_to_keep].copy()
+    
+    #traitement des valeurs nulles
+    df_stadiums_transformed= fct_fillna_and_convert_types(df_stadiums_transformed)
+    
+    #supprimer '.' à la fin des noms des villes
     df_stadiums_transformed['city'] = df_stadiums_transformed['city'].str.replace(r'\.$', '', regex=True)
-
 
     # Mettre en le premier caractère en Majuscule pour les colonnes name et city & convertir en type string
     df_stadiums_transformed = fct_capitalize_string_columns(df_stadiums_transformed, ['name', 'city'])
@@ -226,7 +232,10 @@ def fct_transform_data_2018(dfs_2018 : Dict[str, pd.DataFrame] , config: Dict) -
     # Filtrer les colonnes nécessaires
     columns_to_keep = ['id', 'name']
     df_teams_transformed = df_teams[columns_to_keep].copy()
-
+    
+    #traitement des valeurs nulles
+    df_teams_transformed = fct_fillna_and_convert_types(df_teams_transformed)
+    
     # Mettre en le premier caractère en Majuscule pour la colonne name & convertir en type string
     df_teams_transformed = fct_capitalize_string_columns(df_teams_transformed, ['name'])
     
@@ -239,6 +248,9 @@ def fct_transform_data_2018(dfs_2018 : Dict[str, pd.DataFrame] , config: Dict) -
     # Mettre en le premier caractère en Muniscule pour la colonne group_id & convertir en type string
     df_groups_transformed = fct_lower_string_columns(df_groups_transformed, ['group_id'])
     
+    #traitement des valeurs nulles
+    df_groups_transformed = fct_fillna_and_convert_types(df_groups_transformed)
+
     #-------------------------------------------------------------------------
     #------------------------rounds transformations #------------------------
     #-------------------------------------------------------------------------
@@ -248,6 +260,9 @@ def fct_transform_data_2018(dfs_2018 : Dict[str, pd.DataFrame] , config: Dict) -
     # Mettre en le premier caractère en Majuscule pour la colonne round_name & convertir en type string
     df_rounds_transformed = fct_capitalize_string_columns(df_rounds_transformed, ['round_name'])
     
+    #traitement des valeurs nulles
+    df_rounds_transformed = fct_fillna_and_convert_types(df_rounds_transformed)
+    
     #-------------------------------------------------------------------------
     #------------------------matches transformations #------------------------
     #-------------------------------------------------------------------------
@@ -256,10 +271,9 @@ def fct_transform_data_2018(dfs_2018 : Dict[str, pd.DataFrame] , config: Dict) -
 
     # Mettre en le premier caractère en Majuscule pour la colonne stage et type & convertir en type string
     df_matches_transformed = fct_capitalize_string_columns(df_matches_transformed, ['stage','type'])
-
-    # Remplir les valeurs manquantes dans 'round_id' et 'group_id' avec 'notdefined'
-    df_matches_transformed['round_id'] = df_matches_transformed['round_id'].fillna('notdefined')
-    df_matches_transformed['group_id'] = df_matches_transformed['group_id'].fillna('notdefined')
+                
+    #traitement des valeurs nulles
+    df_matches_transformed = fct_fillna_and_convert_types(df_matches_transformed)
 
     # Générer une colonne unique 'stage' en combinant les colonnes 'round_id' et 'group_id'.
     df_matches_transformed = fct_generate_unique_stage(df_matches_transformed, 'stage', 'round_id', 'group_id')
@@ -299,6 +313,10 @@ def fct_transform_data_2018(dfs_2018 : Dict[str, pd.DataFrame] , config: Dict) -
                     .merge(df_rounds_transformed, left_on='match_round_id', right_on='round_round_id', how='left')
                     .merge(df_stadiums_transformed, left_on='match_stadium_id', right_on='stadium_id', how='left')
     )
+    
+     #traitement des valeurs nulles après les merges
+    df_2018_final= fct_fillna_and_convert_types(df_2018_final)
+                
     #-------------------------------------------------------------------------
     #--------------------Garder que les colonnes demandées--------------------
     #-------------------------------------------------------------------------

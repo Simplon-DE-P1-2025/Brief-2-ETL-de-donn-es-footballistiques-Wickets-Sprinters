@@ -1,31 +1,37 @@
 import pandas as pd
 import pytest
-
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 from etl.transform import trf_file_wcup_2014
+
 
 # test def trf_file_wcup_2014
 @pytest.fixture
 def sample_config():
     return {
-        'colonnes_retenues': ['date', 'home_team', 'away_team', 'home_result', 'away_result', 'stage', 'edition', 'city'],
-        'news_columns': {
-            'home_team': 'home_team',
-            'away_team': 'away_team',
-            'home_result': 'home_result',
-            'away_result': 'away_result',
-            'stage': 'stage',
-            'edition': 'edition',
-            'city': 'city',
-            'date': 'date'
-        },
-        'stage_mapping': {
-            'Group': 'Group Stage',
-            'Final': 'Final'
-        },
-        'correction_team_mapping': {
-            'Brasil': 'Brazil',
-            'Deutschland': 'Germany'
-        }
+        'trf_file_wcup_2014': {       
+            'colonnes_retenues': [
+                'date', 'home_team', 'away_team', 'home_result', 'away_result', 'stage', 'edition', 'city'
+            ],
+            'news_columns': {
+                'home_team': 'home_team',
+                'away_team': 'away_team',
+                'home_result': 'home_result',
+                'away_result': 'away_result',
+                'stage': 'stage',
+                'edition': 'edition',
+                'city': 'city',
+                'date': 'date'
+            },
+            'stage_mapping': {
+                'Group': 'Group Stage',
+                'Final': 'Final'
+            },
+            'correction_team_mapping': {
+                'Brasil': 'Brazil',
+                'Deutschland': 'Germany'
+            }}
     }
 
 @pytest.fixture
@@ -40,6 +46,8 @@ def sample_df():
         'edition': [2014, 2014],
         'city': ['Sao Paulo', 'Rio de Janeiro']
     })
+
+
 
 def test_trf_file_wcup_2014(sample_df, sample_config):
     # Appelle fonction

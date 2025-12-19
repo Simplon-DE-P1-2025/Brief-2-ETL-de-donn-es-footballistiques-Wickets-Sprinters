@@ -326,3 +326,24 @@ def fct_harmonize_column_values(
     df[col] = df[col].apply(lambda x: mapping_dict.get(x, x) if pd.notnull(x) else x)
 
     return df
+
+def fct_fillna_and_convert_types(
+    df: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Remplit les valeurs manquantes dans une colonne avec une valeur spécifiée   
+    """
+    for col in df.columns:
+        if df[col].dtype == 'string' or df[col].dtype == 'object':
+            df[col] = df[col].fillna('notdefined').astype("string")
+        elif df[col].dtype.name == 'Int64':
+            df[col] = df[col].fillna(-999).astype("Int64")
+        elif df[col].dtype == 'float64':
+            df[col] = df[col].fillna(-999.0).astype("Float64")
+        elif df[col].dtype == 'datetime64[ns, UTC]':
+            df[col] = df[col].fillna(pd.Timestamp('9999-12-31 23:59:59', tz='UTC'))
+        else:
+            # Pour tous les autres types (bool, category, etc.)
+            if df[col].isna().any():
+                df[col] = df[col].fillna('notdefined')
+    return df
