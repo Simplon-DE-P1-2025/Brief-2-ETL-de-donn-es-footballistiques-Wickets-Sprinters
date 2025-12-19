@@ -51,15 +51,15 @@ def fct_transform_2010(df : pd.DataFrame , config : Dict) -> pd.DataFrame:
         .str.extract(r"(\d+)", expand=False)
         .astype("Int64").fillna(-999)
     )
-    
+
     #rename columns pour etre homogène avec les autres datasets
     dict_columns_2010 = config['dict_columns_2010']
     df = df.rename(columns=dict_columns_2010)
-    
+
     #home_team et away_team, garder que le nom de pays en Anglais
     df[['home_team','home_team_lanorig']] = df['home_team'].str.split('(', expand=True)
     df[['away_team','away_team_lanorig']] = df['away_team'].str.split('(', expand=True)
-    
+
     # Convertir la colonne 'date' en format YYYY en string 
     df["date"] = df["date"].astype("string")
 

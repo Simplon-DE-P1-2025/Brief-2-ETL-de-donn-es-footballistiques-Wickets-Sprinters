@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This module serves as the main entry point for the ETL process.
 It reads configuration parameters, extracts data from multiple sources,
